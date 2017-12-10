@@ -80,7 +80,7 @@ class SimpleUpdater extends Updater {
   }
 }
 
-//TODO: Test
+//TODO: Test if this implementation works in a dense dataset
 //TODO: Pass momentumFraction as a parameter so the user can set it
 
 class MomentumUpdaterNaive extends Updater {
