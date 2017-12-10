@@ -1,4 +1,4 @@
-package bdapro.project.sgd
+package org.apache.spark.mllib.optimization
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
