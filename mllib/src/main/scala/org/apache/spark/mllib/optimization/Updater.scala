@@ -96,7 +96,7 @@ class MomentumUpdaterNaive extends Updater {
                         regParam: Double): (Vector, Double) = {
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: BV[Double] = gradient.asBreeze.toDenseVector
-    val momentumNew = momentumOld :*= momentumFraction + stepSize :*= gradient
+    val momentumNew = momentumOld :*= momentumFraction + stepSize :*= brzGradient
     val weightsNew = brzWeights - momentumNew
     momentumOld = momentumNew
     (Vectors.fromBreeze(weightsNew), 0)
