@@ -13,7 +13,7 @@ import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 //TODO: Test
 class AdagradUpdaterNaive {
 
-  override def compute(
+  def compute(
                         weightsOld: Vector,
                         gradient: Vector,
                         stepSize: Double,
@@ -28,8 +28,8 @@ class AdagradUpdaterNaive {
     val root = brzSqrt(brzSquared + smoothingTerm)
     val matrix = diag(root)
     val smoothed = brzGradient *:* stepSize
-    val substract =  smoothed * inv(matrix)
-    val weightsNew = brzWeights - substract
+    val step =  smoothed * inv(matrix)
+    val weightsNew = brzWeights - step
 
     (Vectors.fromBreeze(weightsNew), 0)
   }
