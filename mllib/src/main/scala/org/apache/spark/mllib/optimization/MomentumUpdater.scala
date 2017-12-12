@@ -6,7 +6,7 @@ import breeze.linalg.{DenseVector, Vector => BV, axpy => brzAxpy, norm => brzNor
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
-class MomentumUpdaterNaive extends Updater {
+class MomentumUpdater{
 
     //TODO: test if it works fastly in a dense dataset
     //TODO: pass momentumFraction as an argument (need to define a new GradientDescent class to pass new parameters)
@@ -14,9 +14,10 @@ class MomentumUpdaterNaive extends Updater {
   private [this] var momentumOld: BV[Double] = _
   private [this] var momentumFraction: Double = 0.9
 
-  override def compute(
+  def compute(
                         weightsOld: Vector,
                         gradient: Vector,
+                        momentumFraction: Double,
                         stepSize: Double,
                         iter: Int,
                         regParam: Double): (Vector, Double) = {
