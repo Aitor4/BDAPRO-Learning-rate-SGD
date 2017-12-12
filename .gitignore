@@ -9,6 +9,7 @@
 !MomentumUpdater.scala
 !NesterovUpdater.scala
 !MomentumGradientDescent.scala
+!NesterovGradientDescent.scala
 # etc...
 
 # ...even if they are in subdirectories

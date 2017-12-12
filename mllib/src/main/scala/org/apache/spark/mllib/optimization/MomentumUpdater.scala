@@ -9,10 +9,8 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 class MomentumUpdater{
 
     //TODO: test if it works fastly in a dense dataset
-    //TODO: pass momentumFraction as an argument (need to define a new GradientDescent class to pass new parameters)
 
   private [this] var momentumOld: BV[Double] = _
-  private [this] var momentumFraction: Double = 0.9
 
   def compute(
                         weightsOld: Vector,

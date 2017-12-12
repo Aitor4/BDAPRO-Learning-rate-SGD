@@ -7,22 +7,20 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 
-class NesterovUpdater extends Updater {
-  /* TODO: Define a new GradientDescent
-  TODO: pass momentumFraction as an argument instead of defining it
-  TODO: gradientShifted has to be calculated from the new position using the old momentum in GradientDescent
+class NesterovUpdater{
+  /*
   TODO: Test for correctness
    */
 
 
   private [this] var momentumOld: BV[Double] = _
-  private [this] var momentumFraction: Double = 0.9
 
-  override def compute(weightsOld: Vector,
+  def compute(weightsOld: Vector,
                         gradientShifted: Vector,
+                        momentumFraction: Double,
                         stepSize: Double,
                         iter: Int,
-                        regParam: Double): (Vector, Double) = {
+                        regParam: Double): (Vector, Double, Vector) = {
 
 
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
@@ -30,6 +28,6 @@ class NesterovUpdater extends Updater {
     val momentumNew = momentumOld :*= momentumFraction + stepSize :*= brzGradient
     val weightsNew = brzWeights - momentumNew
     momentumOld = momentumNew
-    (Vectors.fromBreeze(weightsNew), 0)
+    (Vectors.fromBreeze(weightsNew), 0, Vectors.fromBreeze(weightsNew-momentumNew))
   }
 }
