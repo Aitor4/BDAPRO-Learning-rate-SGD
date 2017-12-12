@@ -10,7 +10,7 @@ class MomentumUpdater{
 
     //TODO: test if it works fastly in a dense dataset
 
-  private [this] var momentumOld: BV[Double] = _
+  private [this] var momentumOld: BV[Double] = null
 
   def compute(
                         weightsOld: Vector,
@@ -19,6 +19,7 @@ class MomentumUpdater{
                         stepSize: Double,
                         iter: Int,
                         regParam: Double): (Vector, Double) = {
+    if(momentumOld == null) {momentumOld = DenseVector.zeros[Double](weightsOld.size)}
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: BV[Double] = gradient.asBreeze.toDenseVector
     val momentumNew = momentumOld :*= momentumFraction + stepSize :*= brzGradient

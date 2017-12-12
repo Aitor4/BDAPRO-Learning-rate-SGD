@@ -13,7 +13,7 @@ class NesterovUpdater{
    */
 
 
-  private [this] var momentumOld: BV[Double] = _
+  private [this] var momentumOld: BV[Double] = null
 
   def compute(weightsOld: Vector,
                         gradientShifted: Vector,
@@ -21,8 +21,7 @@ class NesterovUpdater{
                         stepSize: Double,
                         iter: Int,
                         regParam: Double): (Vector, Double, Vector) = {
-
-
+    if(momentumOld == null) {momentumOld = DenseVector.zeros[Double](weightsOld.size)}
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: BV[Double] = gradientShifted.asBreeze.toDenseVector
     val momentumNew = momentumOld :*= momentumFraction + stepSize :*= brzGradient
