@@ -8,6 +8,7 @@
 !Updater.scala
 !MomentumUpdater.scala
 !NesterovUpdater.scala
+!AdagradUpdater.scala
 !MomentumGradientDescent.scala
 !NesterovGradientDescent.scala
 # etc...

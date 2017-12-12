@@ -83,23 +83,6 @@ class SimpleUpdater extends Updater {
 
 
 
-//TODO: Change the arguments with which we call this updater and keep the oldMomentum in the GradientDescent class
-//TODO: Use the breeze linalg library and so on for efficient computation of vectors
-//TODO: Also, calculate the gradient instead of on the current weights, in (weights-momentumFraction*momentumOld)
-class AdagradUpdaterNaive extends Updater {
-  override def compute(
-                        weightsOld: Vector,
-                        gradient: Vector,
-                        stepSize: Double,
-                        momentumOld: Vector,
-                        momentumFraction: Double,
-                        squareMatrix : Matrix,
-                        smoothingTerm: Double): (Vector, Double) = {
-    val weightsNew = weightsOld - (stepSize/sqrt(squareMatrix + smoothingTerm)) * gradient
-    return weightsNew
-  }
-}
-*/
 
 /**
  * :: DeveloperApi ::
