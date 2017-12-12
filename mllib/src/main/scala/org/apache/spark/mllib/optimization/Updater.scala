@@ -82,21 +82,6 @@ class SimpleUpdater extends Updater {
 
 
 
-//TODO: Change the arguments with which we call this updater and keep the oldMomentum in the GradientDescent class
-//TODO: Use the breeze linalg library and so on for efficient computation of vectors
-//TODO: Also, calculate the gradient instead of on the current weights, in (weights-momentumFraction*momentumOld)
-class NesterovUpdaterNaive extends Updater {
-  override def compute(
-                        weightsOld: Vector,
-                        gradientShifted: Vector,
-                        stepSize: Double,
-                        momentumOld: Vector,
-                        momentumFraction: Double): (Vector, Double) = {
-    val momentumNew = momentumOld * momentumFraction + stepSize * gradientShifted
-    val weightsNew = weightsOld - momentumNew
-    return weightsNew
-  }
-}
 
 //TODO: Change the arguments with which we call this updater and keep the oldMomentum in the GradientDescent class
 //TODO: Use the breeze linalg library and so on for efficient computation of vectors

@@ -7,6 +7,7 @@
 !Flights.scala
 !Updater.scala
 !MomentumUpdater.scala
+!NesterovUpdater.scala
 # etc...
 
 # ...even if they are in subdirectories

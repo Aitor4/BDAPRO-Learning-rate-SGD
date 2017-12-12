@@ -1,27 +1,31 @@
 package org.apache.spark.mllib.optimization
 
-import org.apache.spark.mllib.linalg.{Vector, Vectors}
+import org.apache.spark.mllib.linalg.Vector
 import scala.math._
 import breeze.linalg.{DenseVector, Vector => BV, axpy => brzAxpy, norm => brzNorm}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
-class MomentumUpdaterNaive extends Updater {
 
-    //TODO: test if it works fastly in a dense dataset
-    //TODO: pass momentumFraction as an argument (need to define a new GradientDescent class to pass new parameters)
-
+class NesterovUpdater extends Updater {
+  /* TODO: Define a new GradientDescent
+  TODO: pass momentumFraction as an argument instead of defining it
+  TODO: gradientShifted has to be calculated from the new position using the old momentum in GradientDescent
+  TODO: Test for correctness
+   */
   private [this] var momentumOld: BV[Double] = _
   private [this] var momentumFraction: Double = 0.9
 
   override def compute(
                         weightsOld: Vector,
-                        gradient: Vector,
+                        gradientShifted: Vector,
                         stepSize: Double,
-                        iter: Int,
-                        regParam: Double): (Vector, Double) = {
+                        momentumOld: Vector,
+                        momentumFraction: Double): (Vector, Double) = {
+
+
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
-    val brzGradient: BV[Double] = gradient.asBreeze.toDenseVector
+    val brzGradient: BV[Double] = gradientShifted.asBreeze.toDenseVector
     val momentumNew = momentumOld :*= momentumFraction + stepSize :*= brzGradient
     val weightsNew = brzWeights - momentumNew
     momentumOld = momentumNew
