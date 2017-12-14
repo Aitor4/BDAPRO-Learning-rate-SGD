@@ -11,6 +11,7 @@
 !AdagradUpdater.scala
 !MomentumGradientDescent.scala
 !NesterovGradientDescent.scala
+!AdagradGradientDescent.scala
 # etc...
 
 # ...even if they are in subdirectories
