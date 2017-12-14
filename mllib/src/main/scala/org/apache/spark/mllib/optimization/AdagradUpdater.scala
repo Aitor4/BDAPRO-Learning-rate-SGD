@@ -26,7 +26,7 @@ class AdagradUpdater{
 
     val root = brzSqrt(brzSquared + smoothingTerm)
     val matrix = diag(root)
-    val grad = brzGradient *:* stepSize
+    val grad = brzGradient * stepSize
     val update =  grad * inv(matrix)
     val weightsNew = brzWeights - update
 
