@@ -8,7 +8,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 
 class NesterovUpdater{
-  
+
 
   private [this] var momentumOld: BV[Double] = null
 

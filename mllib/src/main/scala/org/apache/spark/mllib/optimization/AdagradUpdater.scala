@@ -8,29 +8,31 @@ import breeze.numerics.{sqrt => brzSqrt}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 
-//TODO: Check that matrix multiplication size is performed correctly
-//TODO: Test
 class AdagradUpdater{
 
-  def compute(
-                        weightsOld: Vector,
-                        gradient: Vector,
-                        stepSize: Double,
-                        squareGradients : Vector,
-                        smoothingTerm: Double,
-                        iter: Int,
-                        regParam : Double): (Vector, Double) = {
-    val brzSquared: BV[Double] = squareGradients.asBreeze.toDenseVector
-    val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
-    val brzGradient: BV[Double] = gradient.asBreeze.toDenseVector
+  private [this] var squaredGradients: DenseVector[Double] = null
 
-    val root = brzSqrt(brzSquared + smoothingTerm)
-    val matrix = diag(root)
-    val grad = brzGradient * stepSize
-    val update =  grad * inv(matrix)
+  def compute(weightsOld: Vector,
+              gradient: Vector,
+              stepSize: Double,
+              smoothingTerm: Double,
+              iter: Int,
+              regParam : Double): (Vector, Double) = {
+    val brzWeights: DenseVector[Double] = weightsOld.asBreeze.toDenseVector
+    val brzGradient: DenseVector[Double] = gradient.asBreeze.toDenseVector
+    if(squaredGradients == null) squaredGradients = brzGradient :* brzGradient
+    else squaredGradients = squaredGradients + (brzGradient :* brzGradient)
+    val denom: DenseVector[Double] = squaredGradients + smoothingTerm
+    val root=brzSqrt(denom)
+    val mult = DenseVector.fill(weightsOld.size){stepSize} / root
+    /*Even though the equation shows a multiplication of a diagonal matrix and a svector,
+  here it is transformed to an element-wise multiplication of the diagonal (in vector representation)
+  and the vector. The operation is equivalent and it saves memory space and computation time*/
+    val update: DenseVector[Double] =  mult :* brzGradient
     val weightsNew = brzWeights - update
 
     (Vectors.fromBreeze(weightsNew), 0)
   }
+
 }
 

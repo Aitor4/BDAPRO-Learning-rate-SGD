@@ -209,12 +209,11 @@ object AdagradGradientDescent extends Logging {
       * if it's L2 updater; for L1 updater, the same logic is followed.
       */
     var regVal = updater.compute(
-      weights, Vectors.zeros(weights.size), 0, Vectors.zeros(weights.size), smoothingTerm, 0, regParam)._2
+      weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
 
     var converged = false // indicates whether converged based on convergenceTol
     var i = 1
     while (!converged && i <= numIterations) {
-      var squareGradients = BDV.zeros[Double](weights.size)
       val bcWeights = data.context.broadcast(weights)
       // Sample a subset (fraction miniBatchFraction) of the total data
       // compute and sum up the subgradients on this subset (this is one map-reduce)
@@ -236,10 +235,9 @@ object AdagradGradientDescent extends Logging {
           * lossSum is computed using the weights from the previous iteration
           * and regVal is the regularization value computed in the previous iteration as well.
           */
-        squareGradients = squareGradients + ((gradientSum / miniBatchSize.toDouble) * (gradientSum / miniBatchSize.toDouble))
         stochasticLossHistory += lossSum / miniBatchSize + regVal
         val update = updater.compute(
-          weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, Vectors.fromBreeze(squareGradients), smoothingTerm,
+          weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm,
           i, regParam)
         weights = update._1
         regVal = update._2
