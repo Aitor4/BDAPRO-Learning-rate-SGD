@@ -28,13 +28,15 @@ class AdamUpdater {
     if(squaredGradients == null) {
       squaredGradients = betaS * (brzGradient :* brzGradient)
       gradients = beta * brzGradient
+      betaPower = beta
+      betaSPower = betaS
     }
     else {
       squaredGradients = betaS * squaredGradients + (1-betaS) * (brzGradient :* brzGradient)
       gradients = beta*gradients + (1-beta)* brzGradient
+      betaPower = betaPower * beta
+      betaSPower = betaSPower * betaS
     }
-    betaPower = betaPower * beta
-    betaSPower = betaSPower * betaS
     val m =  (1/(1-betaPower)) * gradients
     val v = (1/(1-betaSPower)) * squaredGradients
     val denom: DenseVector[Double] = brzSqrt(v) + smoothingTerm
