@@ -30,8 +30,8 @@ class AdamUpdater {
       gradients = beta * brzGradient
     }
     else {
-      squaredGradients = (1-betaS) * squaredGradients + betaS * (brzGradient :* brzGradient)
-      gradients = (1-beta)*gradients + beta* brzGradient
+      squaredGradients = betaS * squaredGradients + (1-betaS) * (brzGradient :* brzGradient)
+      gradients = beta*gradients + (1-beta)* brzGradient
     }
     betaPower = betaPower * beta
     betaSPower = betaSPower * betaS
