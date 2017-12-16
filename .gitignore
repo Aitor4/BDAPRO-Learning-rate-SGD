@@ -10,10 +10,12 @@
 !NesterovUpdater.scala
 !AdagradUpdater.scala
 !AdamUpdater.scala
+!AdamaxUpdater.scala
 !MomentumGradientDescent.scala
 !NesterovGradientDescent.scala
 !AdagradGradientDescent.scala
 !AdamGradientDescent.scala
+!AdamaxGradientDescent.scala
 # etc...
 
 # ...even if they are in subdirectories
