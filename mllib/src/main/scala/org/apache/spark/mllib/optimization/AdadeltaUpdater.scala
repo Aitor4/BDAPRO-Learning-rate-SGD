@@ -5,7 +5,7 @@ import breeze.numerics.{sqrt => brzSqrt}
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 
-class AdadeltaUpdater extends AdaUpdater {
+class AdadeltaUpdater {
 
   private [this] var accGradient: DenseVector[Double] = null
   private [this] var accUpdates: DenseVector[Double] = null
