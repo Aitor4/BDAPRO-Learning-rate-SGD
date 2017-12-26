@@ -18,6 +18,8 @@
 !AdamGradientDescent.scala
 !AdamaxGradientDescent.scala
 !GradientDescentAlg.scala
+!NadamUpdater.scala
+!RMSpropUpdater.scala
 # etc...
 
 # ...even if they are in subdirectories
