@@ -26,14 +26,14 @@ import org.apache.spark.rdd.RDD
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Class used to solve an optimization problem using Gradient Descent.
+  * Class used to solve an optimization problem using Gradient Descent.
   *
   * @param gradient Gradient function to be used.
   * @param updater Updater to be used to update weights after every iteration.
   */
 class GradientDescentAlg private[spark](
-                                          private var gradient: Gradient,
-                                          private var updater: AdaUpdater)
+                                         private var gradient: Gradient,
+                                         private var updater: AdaUpdater)
   extends Optimizer with Logging {
 
   private var learningRate: Double = 1.0
@@ -184,9 +184,9 @@ class GradientDescentAlg private[spark](
 }
 
 /**
- * :: DeveloperApi ::
- * Top-level method to run gradient descent.
- */
+  * :: DeveloperApi ::
+  * Top-level method to run gradient descent.
+  */
 @DeveloperApi
 object GradientDescentAlg extends Logging {
   /**
@@ -214,20 +214,20 @@ object GradientDescentAlg extends Logging {
     *         stochastic loss computed for every iteration.
     */
   def runMiniBatch(
-                       data: RDD[(Double, Vector)],
-                       gradient: Gradient,
-                       updater: AdaUpdater,
-                       momentumFraction: Double,
-                       stepSize: Double,
-                       learningRate: Double,
-                       numIterations: Int,
-                       regParam: Double,
-                       miniBatchFraction: Double,
-                       initialWeights: Vector,
-                       smoothingTerm: Double,
-                       beta: Double,
-                       betaS: Double,
-                       convergenceTol: Double): (Vector, Array[Double]) = {
+                    data: RDD[(Double, Vector)],
+                    gradient: Gradient,
+                    updater: AdaUpdater,
+                    momentumFraction: Double,
+                    stepSize: Double,
+                    learningRate: Double,
+                    numIterations: Int,
+                    regParam: Double,
+                    miniBatchFraction: Double,
+                    initialWeights: Vector,
+                    smoothingTerm: Double,
+                    beta: Double,
+                    betaS: Double,
+                    convergenceTol: Double): (Vector, Array[Double]) = {
 
     // convergenceTol should be set with non minibatch settings
     if (miniBatchFraction < 1.0 && convergenceTol > 0.0) {
@@ -266,23 +266,29 @@ object GradientDescentAlg extends Logging {
     var regVal = 0.0
     updater match {
       case _: AdamUpdater =>
-          regVal = updater.asInstanceOf[AdamUpdater].compute(
+        regVal = updater.asInstanceOf[AdamUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
       case _: AdagradUpdater =>
-          regVal = updater.asInstanceOf[AdagradUpdater].compute(
+        regVal = updater.asInstanceOf[AdagradUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
       case _: MomentumUpdater =>
-          regVal = updater.asInstanceOf[MomentumUpdater].compute(
+        regVal = updater.asInstanceOf[MomentumUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, 0, 1, regParam)._2
       case _: NesterovUpdater =>
-          regVal = updater.asInstanceOf[NesterovUpdater].compute(
+        regVal = updater.asInstanceOf[NesterovUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, 0, 1, regParam)._2
       case _: AdamaxUpdater =>
-          regVal = updater.asInstanceOf[AdamaxUpdater].compute(
+        regVal = updater.asInstanceOf[AdamaxUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
       case _: AdadeltaUpdater =>
-          regVal = updater.asInstanceOf[AdadeltaUpdater].compute(
+        regVal = updater.asInstanceOf[AdadeltaUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, 0, regParam)._2
+      case _: RMSpropUpdater =>
+        regVal = updater.asInstanceOf[RMSpropUpdater].compute(
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, 0, regParam)._2
+      case _:NadamUpdater =>
+        regVal = updater.asInstanceOf[NadamUpdater].compute(
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
     }
 
 
@@ -355,6 +361,18 @@ object GradientDescentAlg extends Logging {
               i, momentumFraction ,regParam)
             weights = update._1
             regVal = update._2
+          case _: RMSpropUpdater =>
+            val update = updater.asInstanceOf[RMSpropUpdater].compute(
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm,
+              i, momentumFraction ,regParam)
+            weights = update._1
+            regVal = update._2
+          case _: NadamUpdater =>
+            val update = updater.asInstanceOf[NadamUpdater].compute(
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm, beta, betaS,
+              i, regParam)
+            weights = update._1
+            regVal = update._2
         }
 
         previousWeights = currentWeights
@@ -380,19 +398,19 @@ object GradientDescentAlg extends Logging {
     * Alias of [[runMiniBatch]] with convergenceTol set to default value of 0.001.
     */
   def runMiniBatch(
-                       data: RDD[(Double, Vector)],
-                       gradient: Gradient,
-                       updater: AdaUpdater,
-                       momentumFraction: Double,
-                       stepSize: Double,
-                       learningRate: Double,
-                       numIterations: Int,
-                       regParam: Double,
-                       miniBatchFraction: Double,
-                       smoothingTerm: Double,
-                       beta: Double,
-                       betaS: Double,
-                       initialWeights: Vector): (Vector, Array[Double]) =
+                    data: RDD[(Double, Vector)],
+                    gradient: Gradient,
+                    updater: AdaUpdater,
+                    momentumFraction: Double,
+                    stepSize: Double,
+                    learningRate: Double,
+                    numIterations: Int,
+                    regParam: Double,
+                    miniBatchFraction: Double,
+                    smoothingTerm: Double,
+                    beta: Double,
+                    betaS: Double,
+                    initialWeights: Vector): (Vector, Array[Double]) =
     GradientDescentAlg.runMiniBatch(data, gradient, updater, momentumFraction, stepSize, learningRate, numIterations,
       regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001)
 
