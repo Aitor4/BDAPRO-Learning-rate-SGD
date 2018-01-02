@@ -33,5 +33,5 @@ class RMSpropUpdater{
 
     (Vectors.fromBreeze(weightsNew), 0)
   }
-  
+
 }

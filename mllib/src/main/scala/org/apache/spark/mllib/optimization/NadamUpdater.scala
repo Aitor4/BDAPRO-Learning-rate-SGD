@@ -37,11 +37,10 @@ class NadamUpdater{
       betaPower = betaPower * beta
       betaSPower = betaSPower * betaS
     }
-    val m =  (1/(1-betaPower)) * gradients
     val v = (1/(1-betaSPower)) * squaredGradients
     val denom: DenseVector[Double] = brzSqrt(v) + smoothingTerm
     val mult = DenseVector.fill(weightsOld.size){stepSize} / denom
-    val mult2 = beta*m + ((1-beta)/(1-betaPower))* brzGradient
+    val mult2 = (beta/(1-betaPower*beta)) * gradients + ((1-beta)/(1-betaPower))* brzGradient
     val update: DenseVector[Double] =  mult :* mult2
     val weightsNew = brzWeights - update
     (Vectors.fromBreeze(weightsNew), 0)
