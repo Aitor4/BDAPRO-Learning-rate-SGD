@@ -43,7 +43,6 @@ class GradientDescentAlg private[spark](
   private var convergenceTol: Double = 0.001
   // for momentum
   private var momentumFraction: Double = 0.9
-  private var stepSize: Double = 1.0
   // for adagrad
   private var smoothingTerm :Double = 0.00000001
   //for adam
@@ -168,7 +167,6 @@ class GradientDescentAlg private[spark](
       gradient,
       updater,
       momentumFraction,
-      stepSize,
       learningRate,
       numIterations,
       regParam,
@@ -218,7 +216,6 @@ object GradientDescentAlg extends Logging {
                     gradient: Gradient,
                     updater: AdaUpdater,
                     momentumFraction: Double,
-                    stepSize: Double,
                     learningRate: Double,
                     numIterations: Int,
                     regParam: Double,
@@ -285,7 +282,7 @@ object GradientDescentAlg extends Logging {
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, 0, regParam)._2
       case _: RMSpropUpdater =>
         regVal = updater.asInstanceOf[RMSpropUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
       case _:NadamUpdater =>
         regVal = updater.asInstanceOf[NadamUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
@@ -326,50 +323,50 @@ object GradientDescentAlg extends Logging {
         updater match {
           case _: AdamUpdater =>
             val update = updater.asInstanceOf[AdamUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm, beta, betaS,
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
               i, regParam)
             weights = update._1
             regVal = update._2
           case _: AdagradUpdater =>
             val update = updater.asInstanceOf[AdagradUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm,
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
               i, regParam)
             weights = update._1
             regVal = update._2
           case _: MomentumUpdater =>
             val update = updater.asInstanceOf[MomentumUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              stepSize, i, regParam)
+              learningRate, i, regParam)
             weights = update._1
             regVal = update._2
           case _: NesterovUpdater =>
             val update = updater.asInstanceOf[NesterovUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              stepSize, i, regParam)
+              learningRate, i, regParam)
             weights = update._1
             regVal = update._2
             weightsShifted = update._3
           case _: AdamaxUpdater =>
             val update = updater.asInstanceOf[AdamaxUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm, beta, betaS,
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
               i, regParam)
             weights = update._1
             regVal = update._2
           case _: AdadeltaUpdater =>
             val update = updater.asInstanceOf[AdadeltaUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm,
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
               i, momentumFraction ,regParam)
             weights = update._1
             regVal = update._2
           case _: RMSpropUpdater =>
             val update = updater.asInstanceOf[RMSpropUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm,
-              i, momentumFraction ,regParam)
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
+              i, regParam)
             weights = update._1
             regVal = update._2
           case _: NadamUpdater =>
             val update = updater.asInstanceOf[NadamUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), stepSize, smoothingTerm, beta, betaS,
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
               i, regParam)
             weights = update._1
             regVal = update._2
@@ -402,7 +399,6 @@ object GradientDescentAlg extends Logging {
                     gradient: Gradient,
                     updater: AdaUpdater,
                     momentumFraction: Double,
-                    stepSize: Double,
                     learningRate: Double,
                     numIterations: Int,
                     regParam: Double,
@@ -411,7 +407,7 @@ object GradientDescentAlg extends Logging {
                     beta: Double,
                     betaS: Double,
                     initialWeights: Vector): (Vector, Array[Double]) =
-    GradientDescentAlg.runMiniBatch(data, gradient, updater, momentumFraction, stepSize, learningRate, numIterations,
+    GradientDescentAlg.runMiniBatch(data, gradient, updater, momentumFraction, learningRate, numIterations,
       regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001)
 
 
@@ -425,7 +421,7 @@ object GradientDescentAlg extends Logging {
 
     // This represents the difference of updated weights in the iteration.
     val solutionVecDiff: Double = norm(previousBDV - currentBDV)
-
+    println("Diff: "+solutionVecDiff)
     solutionVecDiff < convergenceTol * Math.max(norm(currentBDV), 1.0)
   }
 

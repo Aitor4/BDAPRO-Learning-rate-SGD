@@ -15,7 +15,6 @@ class RMSpropUpdater{
               stepSize: Double,
               smoothingTerm: Double,
               iter: Int,
-              rho: Double,
               regParam : Double): (Vector, Double) = {
     val brzWeights: DenseVector[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: DenseVector[Double] = gradient.asBreeze.toDenseVector
@@ -23,18 +22,16 @@ class RMSpropUpdater{
     if (accGradient == null) accGradient = DenseVector.zeros(gradient.size)
 
     //accumulate gradient
-    accGradient = rho*accGradient + (1-rho) * (brzGradient :* brzGradient)
+    accGradient = 0.9*accGradient + 0.1 * (brzGradient :* brzGradient)
 
     //compute update
-    //A good default value for the learning rate (stepSize) is 0.001 for this alg.
     val denom: DenseVector[Double] = brzSqrt(accGradient + smoothingTerm)
-    val optStepSize = 0.001
-    val mult =  DenseVector.fill(weightsOld.size){ optStepSize }/ denom
+    val mult =  DenseVector.fill(weightsOld.size){ stepSize }/ denom
     val update: DenseVector[Double] =  mult :* brzGradient
 
     val weightsNew = brzWeights - update
 
     (Vectors.fromBreeze(weightsNew), 0)
   }
-
+  
 }
