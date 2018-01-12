@@ -23,7 +23,7 @@ Running for 100 iterations:
 Simple SGD:  Accuracy = 0.831951354339414, time elapsed: 11854 milliseconds.  
 Momentum: Accuracy = 0.8504391622136233, time elapsed: 15012 milliseconds.  
 Nesterov: Accuracy = 0.850316319636386, time elapsed: 14052 milliseconds.  
-Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.   (LR=1)
+Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.   (LR=1)  
 Adadelta: Accuracy = 0.7670290522695166, time elapsed: 14163 milliseconds.  
 RMSProp: Accuracy = 0.7777777777777778, time elapsed: 16001 milliseconds.  
 Adam: Accuracy = 0.8501934770591487, time elapsed: 14132 milliseconds.  
