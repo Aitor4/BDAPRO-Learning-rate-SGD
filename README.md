@@ -1,9 +1,10 @@
 # Learning Rate Adaptation Techniques for Stochastic Gradient Descent in Spark
 (Developing)
 
-The purpose of this project is the implementation of different stochastic gradient descent algorithms in Spark and the study of their performance using different algorithms (logistic regression, SVM, linear regression) and different datasets (sparse and dense).  
+The purpose of this project is the implementation of 8 different stochastic gradient descent algorithms that employ learning rate adaptation techniques in Spark and the study of their performance using different algorithms (logistic regression, SVM, linear regression) and different datasets (sparse and dense).  
 
-So far, we have implemented the different algorithms and tested them in a small, sparse dataset (https://archive.ics.uci.edu/ml/datasets/adult). The results running on a local machine have been the following:  
+So far, we have implemented the different algorithms and tested them in a small, sparse dataset (https://archive.ics.uci.edu/ml/datasets/adult). The testing accuracies running on a local machine have been the following:  
+
   
 Running until convergence (precision = 0.001)  
 
@@ -22,14 +23,43 @@ Running for 100 iterations:
 Simple SGD:  Accuracy = 0.831951354339414, time elapsed: 11854 milliseconds.  
 Momentum: Accuracy = 0.8504391622136233, time elapsed: 15012 milliseconds.  
 Nesterov: Accuracy = 0.850316319636386, time elapsed: 14052 milliseconds.  
-Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.  
+Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.   (LR=1)
 Adadelta: Accuracy = 0.7670290522695166, time elapsed: 14163 milliseconds.  
 RMSProp: Accuracy = 0.7777777777777778, time elapsed: 16001 milliseconds.  
 Adam: Accuracy = 0.8501934770591487, time elapsed: 14132 milliseconds.  
 Adamax: Accuracy = 0.8490264725753947, time elapsed: 13864 milliseconds.  
 Nadam: Accuracy = 0.811068116209078, time elapsed: 13728 milliseconds.  
   
-The step size chosen each algorihtm during the experiments were:  
+**It is important to note that the testing accuracies do not have such a meaningful value as when testing a machine learning algorithm. The purpose of optimizers (such as SGD) is to minimize an error function which is given by the machine learning algorithm on the training set. Therefore, the error measure for an optimizer is the accuracy on the training set. Conversely, the error measure for a machine learning algorithm (logistic regression in this case) is the accuracy on the test set. The machine learning algorithm is the part concern with avoiding overfitting. This is done by modifying the error function (e.g. introducing a penalization for having large weights). This in practice modifies the error that the optimizer is trying to minimze. We do not use regularization parameters in our tests because they are not relevant as explained, but they could be easily introduced. 
+
+The training accuracies running on a local machine have been the following:  
+
+Iterations = inf
+Precision = 0.001
+
+Simple: 
+Momentum: Accuracy = 0.8486486486486486
+Nesterov: Accuracy = 0.8486486486486486
+Adagrad: Accuracy = 0.8338452088452089
+Adadelta: Accuracy = 0.8436117936117936
+RMSprop: Accuracy = 0.8489864864864864
+Adam: Accuracy = 0.846406633906634
+Adamax: Accuracy = 0.8441953316953317
+Nadam:  Accuracy = 0.8464373464373465
+
+Iterations = 100
+Precision = inf
+
+Momentum: Accuracy = 0.8481265356265356
+Nesterov: Accuracy = 0.8481265356265356
+Adagrad: Accuracy = 0.8484950859950859 (LR = 1)
+Adadelta: Accuracy = 0.7621621621621621
+RMSprop: Accuracy = 0.8487100737100737 (LR = 0.01)
+Adam: Accuracy = 0.8481879606879607 (LR = 0.02)
+Adamax: Accuracy = 0.8447481572481572 (LR = 0.02)
+Nadam: Accuracy = 0.8481879606879607 (LR = 0.02)
+
+Except for where specified (LR=X), the step size chosen each algorihtm during the experiments were:  
   
 Simple SGD: 1  
 Momentum: 1  
