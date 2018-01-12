@@ -32,12 +32,12 @@ Nadam: Accuracy = 0.811068116209078, time elapsed: 13728 milliseconds.
   
 **It is important to note that the testing accuracies do not have such a meaningful value as when testing a machine learning algorithm. The purpose of optimizers (such as SGD) is to minimize an error function which is given by the machine learning algorithm on the training set. Therefore, the error measure for an optimizer is the accuracy on the training set. Conversely, the error measure for a machine learning algorithm (logistic regression in this case) is the accuracy on the test set. The machine learning algorithm is the part concern with avoiding overfitting. This is done by modifying the error function (e.g. introducing a penalization for having large weights). This in practice modifies the error that the optimizer is trying to minimze. We do not use regularization parameters in our tests because they are not relevant as explained, but they could be easily introduced.**  
 
-The training accuracies running on a local machine have been the following:    
+The running times on the training set are equivalent to the ones described previously (the work that SGD does is exactly the same). The training accuracies running on a local machine have been the following:    
 
 Iterations = inf  
 Precision = 0.001  
 
-Simple:   
+Simple: Accuracy = 0.8354115479115479  
 Momentum: Accuracy = 0.8486486486486486  
 Nesterov: Accuracy = 0.8486486486486486   
 Adagrad: Accuracy = 0.8338452088452089  
@@ -50,6 +50,7 @@ Nadam:  Accuracy = 0.8464373464373465
 Iterations = 100  
 Precision = inf  
   
+Simple: Accuracy = 0.832463144963145    
 Momentum: Accuracy = 0.8481265356265356  
 Nesterov: Accuracy = 0.8481265356265356  
 Adagrad: Accuracy = 0.8484950859950859 (LR = 1)  
