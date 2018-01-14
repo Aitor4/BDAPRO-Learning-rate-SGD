@@ -262,6 +262,9 @@ object GradientDescentAlg extends Logging {
 
     var regVal = 0.0
     updater match {
+      case _: SimpleUpdater =>
+        regVal = updater.asInstanceOf[SimpleUpdater].compute(
+          weights, Vectors.zeros(weights.size), 0, 0, regParam)._2
       case _: AdamUpdater =>
         regVal = updater.asInstanceOf[AdamUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
@@ -321,6 +324,11 @@ object GradientDescentAlg extends Logging {
         stochasticLossHistory += lossSum / miniBatchSize + regVal
 
         updater match {
+          case _: SimpleUpdater =>
+            val update = updater.asInstanceOf[SimpleUpdater].compute(
+              weights, Vectors.zeros(weights.size), learningRate, i, regParam)
+            weights = update._1
+            regVal = update._2
           case _: AdamUpdater =>
             val update = updater.asInstanceOf[AdamUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
