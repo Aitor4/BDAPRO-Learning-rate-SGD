@@ -326,7 +326,7 @@ object GradientDescentAlg extends Logging {
         updater match {
           case _: SimpleUpdater =>
             val update = updater.asInstanceOf[SimpleUpdater].compute(
-              weights, Vectors.zeros(weights.size), learningRate, i, regParam)
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, i, regParam)
             weights = update._1
             regVal = update._2
           case _: AdamUpdater =>
