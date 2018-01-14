@@ -21,6 +21,8 @@
 !NadamUpdater.scala
 !RMSpropUpdater.scala
 !AdaptiveUpdater.scala
+!LogisticRegressionWithAdaSGD.scala
+!SVMWithAdaSGD.scala
 # etc...
 
 # ...even if they are in subdirectories
