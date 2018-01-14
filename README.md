@@ -67,7 +67,7 @@ Precision = 0.001
   
 Simple: Accuracy = 0.8391584766584766, time elapsed: 24454 millisecond.  
 Momentum: Accuracy = 0.8495085995085995, time elapsed: 38851 millisecond.  
-Nesterov: Doesn't converge??  
+Nesterov: Accuracy = 0.8468980343980343, time elapsed: 26712 millisecond. (LR=0.1)  
 Adagrad: Accuracy = 0.8497542997542997, time elapsed: 138820 millisecond.  
 Adadelta: Accuracy = 0.8464373464373465, time elapsed: 101239 millisecond.  
 RMSprop: Accuracy = 0.8492321867321867, time elapsed: 73808 millisecond.  
