@@ -8,7 +8,7 @@ import breeze.numerics.{sqrt => brzSqrt}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 
-class AdamUpdater {
+class AdamUpdater extends AdaptiveUpdater {
 
   private [this] var squaredGradients: DenseVector[Double] = null
   private [this] var gradients: DenseVector[Double] = null

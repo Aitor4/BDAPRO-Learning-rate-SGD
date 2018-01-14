@@ -7,7 +7,7 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 
-class NesterovUpdater{
+class NesterovUpdater extends AdaptiveUpdater{
 
 
   private [this] var momentumOld: BV[Double] = null
@@ -24,6 +24,6 @@ class NesterovUpdater{
     val momentumNew = momentumOld * momentumFraction + brzGradient * stepSize
     val weightsNew = brzWeights - momentumNew
     momentumOld = momentumNew
-    (Vectors.fromBreeze(weightsNew), 0, Vectors.fromBreeze(weightsNew-momentumNew))
+    (Vectors.fromBreeze(weightsNew), 0, Vectors.fromBreeze(weightsNew-momentumFraction*momentumNew))
   }
 }

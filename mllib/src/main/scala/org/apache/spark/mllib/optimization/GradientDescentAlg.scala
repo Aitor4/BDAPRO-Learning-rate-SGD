@@ -33,7 +33,7 @@ import scala.collection.mutable.ArrayBuffer
   */
 class GradientDescentAlg private[spark](
                                          private var gradient: Gradient,
-                                         private var updater: AdaUpdater)
+                                         private var updater: AdaptiveUpdater)
   extends Optimizer with Logging {
 
   private var learningRate: Double = 1.0
@@ -125,7 +125,7 @@ class GradientDescentAlg private[spark](
     * The updater is responsible to perform the update from the regularization term as well,
     * and therefore determines what kind or regularization is used, if any.
     */
-  def setUpdater(updater: AdaUpdater): this.type = {
+  def setUpdater(updater: AdaptiveUpdater): this.type = {
     this.updater = updater
     this
   }
@@ -214,7 +214,7 @@ object GradientDescentAlg extends Logging {
   def runMiniBatch(
                     data: RDD[(Double, Vector)],
                     gradient: Gradient,
-                    updater: AdaUpdater,
+                    updater: AdaptiveUpdater,
                     momentumFraction: Double,
                     learningRate: Double,
                     numIterations: Int,
@@ -302,7 +302,7 @@ object GradientDescentAlg extends Logging {
       // Sample a subset (fraction miniBatchFraction) of the total data
       // compute and sum up the subgradients on this subset (this is one map-reduce)
       val (gradientSum, lossSum, miniBatchSize) = data.sample(false, miniBatchFraction, 42 + i)
-        .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(
+        .treeAggregate((BDV.zeros[Double](n), 0.0, 0L)) (
           seqOp = (c, v) => {
             // c: (grad, loss, count), v: (label, features)
             val l = gradient.compute(v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
@@ -397,7 +397,7 @@ object GradientDescentAlg extends Logging {
   def runMiniBatch(
                     data: RDD[(Double, Vector)],
                     gradient: Gradient,
-                    updater: AdaUpdater,
+                    updater: AdaptiveUpdater,
                     momentumFraction: Double,
                     learningRate: Double,
                     numIterations: Int,
@@ -421,7 +421,6 @@ object GradientDescentAlg extends Logging {
 
     // This represents the difference of updated weights in the iteration.
     val solutionVecDiff: Double = norm(previousBDV - currentBDV)
-    println("Diff: "+solutionVecDiff)
     solutionVecDiff < convergenceTol * Math.max(norm(currentBDV), 1.0)
   }
 

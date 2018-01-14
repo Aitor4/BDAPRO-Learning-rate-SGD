@@ -5,7 +5,7 @@ import breeze.numerics.{sqrt => brzSqrt}
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 
-class RMSpropUpdater{
+class RMSpropUpdater extends AdaptiveUpdater{
 
   private [this] var accGradient: DenseVector[Double] = null
 

@@ -10,6 +10,7 @@ import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+import org.apache.spark.mllib.regression.LinearRegressionWithSGD
 
 
 //targetVariable is the variable we want to predict (our "y")
@@ -115,7 +116,7 @@ class Flights(spark: SparkSession, targetVariable: String) {
       .setOutputCol("features")
 
     // Defining the model.
-    val lr = new LinearRegression()
+    val lr = new LinearRegressionWithSGD()
       .setFeaturesCol("features")
       .setLabelCol(targetVariable)
       .setMaxIter(maxIter)

@@ -6,7 +6,7 @@ import breeze.linalg.{DenseVector, Vector => BV, axpy => brzAxpy, norm => brzNor
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
-class MomentumUpdater{
+class MomentumUpdater extends AdaptiveUpdater{
 
   private [this] var momentumOld: BV[Double] = null
 

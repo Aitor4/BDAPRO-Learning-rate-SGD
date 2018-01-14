@@ -9,7 +9,7 @@ import breeze.numerics.{sqrt => brzSqrt, abs}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mllib.linalg.{Matrix, Vector, Vectors}
 
-class AdamaxUpdater {
+class AdamaxUpdater extends AdaptiveUpdater {
 
 
   private [this] var squaredGradients: DenseVector[Double] = null
