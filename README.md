@@ -13,7 +13,7 @@ Momentum: Accuracy = 0.8505620047908605, time elapsed: 22175 milliseconds.
 Nesters: Accuracy = 0.8505620047908605, time elapsed: 23041 milliseconds.  
 Adagrad: Accuracy = 0.8501320557705301, time elapsed: 30087 milliseconds.  
 Adadelta: Accuracy = 0.8472452552054542, time elapsed: 94333 milliseconds.  
-RMSProp: Accuracy = 0.8501320557705301, time elapsed: 91811 milliseconds.  
+RMSProp: Accuracy = 0.8501320557705301, time elapsed: 91811 milliseconds.  (LR=0.01)
 Adam: Accuracy = 0.8499477919046742, time elapsed: 32701 milliseconds.  
 Adamax: Accuracy = 0.8499477919046742, time elapsed: 26042 milliseconds.  
 Nadam: Accuracy = 0.8472452552054542, time elapsed: 46271 milliseconds.  
@@ -25,7 +25,7 @@ Momentum: Accuracy = 0.8504391622136233, time elapsed: 15012 milliseconds.
 Nesterov: Accuracy = 0.850316319636386, time elapsed: 14052 milliseconds.  
 Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.   (LR=1)  
 Adadelta: Accuracy = 0.7670290522695166, time elapsed: 14163 milliseconds.  
-RMSProp: Accuracy = 0.8493335790184878, time elapsed: 16001 milliseconds. (LR=0.01) 
+RMSProp: Accuracy = 0.8493335790184878, time elapsed: 16001 milliseconds.  
 Adam: Accuracy = 0.8501934770591487, time elapsed: 14132 milliseconds.  
 Adamax: Accuracy = 0.8490264725753947, time elapsed: 13864 milliseconds.  
 Nadam: Accuracy = 0.847798046803022, time elapsed: 13728 milliseconds.    (LR=0.02)
