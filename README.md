@@ -78,7 +78,7 @@ Nadam: Accuracy = 0.8496007371007371, time elapsed: 30380 millisecond. (LR=0.02)
 Iterations = 100  
 Precision = inf  
   
-Simple: Accuracy = 0.8373157248157248, time elapsed: 16681 millisecond.  
+Simple: Accuracy = 0.8373157248157248, time elapsed: 14577 millisecond.  
 Momentum: Accuracy = 0.849017199017199, time elapsed: 15135 millisecond.  
 Nesterov: Accuracy = 0.8495085995085995, time elapsed: 15860 millisecond.  
 Adagrad: Accuracy = 0.8428746928746929, time elapsed: 13265 millisecond. (LR=1)  
