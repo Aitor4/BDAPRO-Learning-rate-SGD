@@ -25,10 +25,10 @@ Momentum: Accuracy = 0.8504391622136233, time elapsed: 15012 milliseconds.
 Nesterov: Accuracy = 0.850316319636386, time elapsed: 14052 milliseconds.  
 Adagrad: Accuracy = 0.8500092131932928, time elapsed: 13749 milliseconds.   (LR=1)  
 Adadelta: Accuracy = 0.7670290522695166, time elapsed: 14163 milliseconds.  
-RMSProp: Accuracy = 0.7777777777777778, time elapsed: 16001 milliseconds.  
+RMSProp: Accuracy = 0.8493335790184878, time elapsed: 16001 milliseconds. (LR=0.01) 
 Adam: Accuracy = 0.8501934770591487, time elapsed: 14132 milliseconds.  
 Adamax: Accuracy = 0.8490264725753947, time elapsed: 13864 milliseconds.  
-Nadam: Accuracy = 0.811068116209078, time elapsed: 13728 milliseconds.    
+Nadam: Accuracy = 0.847798046803022, time elapsed: 13728 milliseconds.    (LR=0.02)
   
 **It is important to note that the testing accuracies do not have such a meaningful value as when testing a machine learning algorithm. The purpose of optimizers (such as SGD) is to minimize an error function which is given by the machine learning algorithm on the training set. Therefore, the error measure for an optimizer is the accuracy on the training set. Conversely, the error measure for a machine learning algorithm (logistic regression in this case) is the accuracy on the test set. The machine learning algorithm is the part concern with avoiding overfitting. This is done by modifying the error function (e.g. introducing a penalization for having large weights). This in practice modifies the error that the optimizer is trying to minimze. We do not use regularization parameters in our tests because they are not relevant as explained, but they could be easily introduced.**  
 
@@ -83,10 +83,10 @@ Momentum: Accuracy = 0.849017199017199, time elapsed: 15135 millisecond.
 Nesterov: Accuracy = 0.8495085995085995, time elapsed: 15860 millisecond.  
 Adagrad: Accuracy = 0.8428746928746929, time elapsed: 13265 millisecond. (LR=1)  
 Adadelta: Accuracy = 0.7591830466830467, time elapsed: 12774 millisecond.  
-RMSprop: Accuracy = 0.8085687960687961, time elapsed: 13534 millisecond.  
-Adam: Accuracy = 0.8468980343980343, time elapsed: 16008 millisecond.  
+RMSprop: Accuracy = 0.8487714987714988, time elapsed: 13534 millisecond. (LR=0.01)
+Adam: Accuracy =  0.8468673218673218, time elapsed: 16008 millisecond.  
 Adamax: Accuracy = 0.8493243243243244, time elapsed: 14434 millisecond.  
-Nadam: Accuracy = 0.8245700245700246, time elapsed: 16277 millisecond.  
+Nadam: Accuracy = 0.8471437346437346, time elapsed: 16277 millisecond.  (LR=0.02) 
   
 Except for where specified (LR=X), the step size chosen each algorihtm during the experiments were:   
   
