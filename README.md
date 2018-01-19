@@ -40,7 +40,7 @@ Precision = 0.001
 Simple: Accuracy = 0.8354115479115479  
 Momentum: Accuracy = 0.8486486486486486  
 Nesterov: Accuracy = 0.8486486486486486   
-Adagrad: Accuracy = 0.8338452088452089  
+Adagrad: Accuracy = 0.8491400491400491 (LR=1)
 Adadelta: Accuracy = 0.8436117936117936  
 RMSprop: Accuracy = 0.8489864864864864  
 Adam: Accuracy = 0.846406633906634  
