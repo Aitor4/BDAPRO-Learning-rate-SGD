@@ -297,9 +297,12 @@ object GradientDescentAlg extends Logging {
 
     while (!converged && i <= numIterations) {
 
-      var bcWeights = data.context.broadcast(weights)
+      var bcWeights: org.apache.spark.broadcast.Broadcast[Vector] = null
       if (updater.isInstanceOf[NesterovUpdater]){
         bcWeights = data.context.broadcast(weightsShifted)
+      }
+      else{
+        bcWeights = data.context.broadcast(weights)
       }
 
       // Sample a subset (fraction miniBatchFraction) of the total data
