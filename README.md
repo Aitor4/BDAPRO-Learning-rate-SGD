@@ -37,15 +37,15 @@ The running times on the training set are equivalent to the ones described previ
 Iterations = inf  
 Precision = 0.001  
 
-Simple: Accuracy = 0.8354115479115479  
-Momentum: Accuracy = 0.8486486486486486  
-Nesterov: Accuracy = 0.8486486486486486   
-Adagrad: Accuracy = 0.8491400491400491 (LR=1)
-Adadelta: Accuracy = 0.8436117936117936  
-RMSprop: Accuracy = 0.8489864864864864  
-Adam: Accuracy = 0.846406633906634  
-Adamax: Accuracy = 0.8441953316953317  
-Nadam:  Accuracy = 0.8464373464373465  
+Simple: Accuracy = 0.8354115479115479  221 iterations    
+Momentum: Accuracy = 0.8486486486486486  223 iterations    
+Nesterov: Accuracy = 0.8486486486486486   224 iterations    
+Adagrad: Accuracy = 0.8491400491400491 (LR=1) 212 iterations    
+Adadelta: Accuracy = 0.8436117936117936  932 iterations    
+RMSprop: Accuracy = 0.8489864864864864  969 iterations  
+Adam: Accuracy = 0.846406633906634  341 iterations  
+Adamax: Accuracy = 0.8441953316953317  335 iterations  
+Nadam:  Accuracy = 0.8464373464373465  348 iterations
   
 Iterations = 100  
 Precision = inf  
