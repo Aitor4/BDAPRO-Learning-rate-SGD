@@ -45,7 +45,8 @@ Adadelta: Accuracy = 0.8436117936117936  932 iterations
 RMSprop: Accuracy = 0.8489864864864864  969 iterations  
 Adam: Accuracy = 0.846406633906634  341 iterations  
 Adamax: Accuracy = 0.8441953316953317  335 iterations  
-Nadam:  Accuracy = 0.8464373464373465  348 iterations
+Nadam:  Accuracy = 0.8464373464373465  348 iterations  
+AMSGrad: Accuracy = 0.8488943488943489, 226 iterations (LR=0.02)  
   
 Iterations = 100  
 Precision = inf  
@@ -74,6 +75,7 @@ RMSprop: Accuracy = 0.8492321867321867, time elapsed: 73808 millisecond.
 Adam: Accuracy = 0.8496621621621622, time elapsed: 33204 millisecond.(LR=0.02)  
 Adamax: Accuracy = 0.8467444717444718, time elapsed: 27212 millisecond. (LR=0.02)  
 Nadam: Accuracy = 0.8496007371007371, time elapsed: 30380 millisecond. (LR=0.02)  
+AMSGrad: Accuracy = 0.8500921375921376, time elapsed: 22044 millisecond.  (LR=0.02)
 
 Iterations = 100  
 Precision = inf  
@@ -99,3 +101,4 @@ RMSProp: 0.001
 Adam: 0.002  
 Adamax: 0.002  
 Nadam: 0.002  
+AMSGrad: 0.002
