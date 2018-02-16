@@ -3,7 +3,7 @@
 
 The purpose of this project is the implementation of 8 different stochastic gradient descent algorithms that employ learning rate adaptation techniques in Spark and the study of their performance using different algorithms (logistic regression, SVM, linear regression...) and different datasets (sparse and dense).  
 
-So far, we have implemented the different algorithms and tested them in a small, sparse dataset (https://archive.ics.uci.edu/ml/datasets/adult). The testing accuracies running on a local machine for the logistic regression algorithm have been the following:  
+So far, we have implemented the different algorithms and tested them in a small, sparse dataset (https://archive.ics.uci.edu/ml/datasets/adult). For the test of this dataset, we compute the whole gradients for each iteration (batch gradient descent) as it makes the convergence faster and more stable. Due to the distributed nature of Spark, still each partition computes a fraction of all the examples (in parallel) which are then accumulated. The testing accuracies running on a local machine for the logistic regression algorithm have been the following:  
 
   
 Running until convergence (precision = 0.001)  
@@ -13,7 +13,7 @@ Momentum: Accuracy = 0.8505620047908605, time elapsed: 22175 milliseconds.
 Nesters: Accuracy = 0.8505620047908605, time elapsed: 23041 milliseconds.  
 Adagrad: Accuracy = 0.8501320557705301, time elapsed: 30087 milliseconds.  
 Adadelta: Accuracy = 0.8472452552054542, time elapsed: 94333 milliseconds.  
-RMSProp: Accuracy = 0.8501320557705301, time elapsed: 91811 milliseconds.  (LR=0.01)
+RMSProp: Accuracy = 0.8501320557705301, time elapsed: 91811 milliseconds.  (LR=0.01)  
 Adam: Accuracy = 0.8499477919046742, time elapsed: 32701 milliseconds.  
 Adamax: Accuracy = 0.8499477919046742, time elapsed: 26042 milliseconds.  
 Nadam: Accuracy = 0.8472452552054542, time elapsed: 46271 milliseconds.  
@@ -83,7 +83,7 @@ Momentum: Accuracy = 0.849017199017199, time elapsed: 15135 millisecond.
 Nesterov: Accuracy = 0.8495085995085995, time elapsed: 15860 millisecond.  
 Adagrad: Accuracy = 0.8428746928746929, time elapsed: 13265 millisecond. (LR=1)  
 Adadelta: Accuracy = 0.7591830466830467, time elapsed: 12774 millisecond.  
-RMSprop: Accuracy = 0.8487714987714988, time elapsed: 13534 millisecond. (LR=0.01)
+RMSprop: Accuracy = 0.8487714987714988, time elapsed: 13534 millisecond. (LR=0.01)  
 Adam: Accuracy =  0.8468673218673218, time elapsed: 16008 millisecond.  
 Adamax: Accuracy = 0.8493243243243244, time elapsed: 14434 millisecond.  
 Nadam: Accuracy = 0.8471437346437346, time elapsed: 16277 millisecond.  (LR=0.02) 
