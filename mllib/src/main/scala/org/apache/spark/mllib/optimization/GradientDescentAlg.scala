@@ -388,10 +388,13 @@ object GradientDescentAlg extends Logging {
         if (previousWeights != None && currentWeights != None) {
           converged = isConverged(previousWeights.get,
             currentWeights.get, convergenceTol)
+          if(converged)
+            println("Converged after "+i+" iterations")
         }
       } else {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
+      println("Loss in iteration "+i+" : "+lossSum / miniBatchSize)
       i += 1
     }
 
