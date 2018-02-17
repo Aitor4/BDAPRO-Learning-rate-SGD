@@ -26,8 +26,8 @@ class NadamUpdater extends AdaptiveUpdater{
     val brzWeights: DenseVector[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: DenseVector[Double] = gradient.asBreeze.toDenseVector
     if(squaredGradients == null) {
-      squaredGradients = betaS * (brzGradient :* brzGradient)
-      gradients = beta * brzGradient
+      squaredGradients = (1-betaS) * (brzGradient :* brzGradient)
+      gradients = (1-beta) * brzGradient
       betaPower = beta
       betaSPower = betaS
     }

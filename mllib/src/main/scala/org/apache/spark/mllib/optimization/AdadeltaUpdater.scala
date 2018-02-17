@@ -9,6 +9,7 @@ class AdadeltaUpdater extends AdaptiveUpdater{
 
   private [this] var accGradient: DenseVector[Double] = null
   private [this] var accUpdates: DenseVector[Double] = null
+  private [this] var updatesInit: Boolean = false
 
 
   def compute(weightsOld: Vector,
@@ -29,7 +30,7 @@ class AdadeltaUpdater extends AdaptiveUpdater{
     //compute update
     val update = (brzSqrt(accUpdates + smoothingTerm) / brzSqrt(accGradient + smoothingTerm)) :* brzGradient
     //accumulate updates
-    accUpdates = rho*accUpdates + (1-rho) * (update :* update)
+    else accUpdates = rho*accUpdates + (1-rho) * (update :* update)
     //apply updates
     val weightsNew = brzWeights - update
 

@@ -23,6 +23,7 @@
 !AdaptiveUpdater.scala
 !LogisticRegressionWithAdaSGD.scala
 !SVMWithAdaSGD.scala
+!AMSGradUpdater.scala
 # etc...
 
 # ...even if they are in subdirectories
