@@ -30,7 +30,7 @@ class AdadeltaUpdater extends AdaptiveUpdater{
     //compute update
     val update = (brzSqrt(accUpdates + smoothingTerm) / brzSqrt(accGradient + smoothingTerm)) :* brzGradient
     //accumulate updates
-    else accUpdates = rho*accUpdates + (1-rho) * (update :* update)
+    accUpdates = rho*accUpdates + (1-rho) * (update :* update)
     //apply updates
     val weightsNew = brzWeights - update
 
