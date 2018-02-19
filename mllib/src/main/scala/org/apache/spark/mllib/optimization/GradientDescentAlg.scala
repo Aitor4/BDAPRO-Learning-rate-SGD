@@ -136,11 +136,15 @@ class GradientDescentAlg private[spark](
   }
 
   def setBeta(b: Double): this.type = {
+    require(beta > 0 && beta <= 1.0,
+      "Beta for mini-batch SGD must be in range (0, 1] but got ${beta}")
     this.beta = b
     this
   }
 
   def setBetaS(bS: Double): this.type = {
+    require(betaS > 0 && betaS <= 1.0,
+      "Beta squared for mini-batch SGD must be in range (0, 1] but got ${betaS}")
     this.betaS = bS
     this
   }
@@ -282,12 +286,15 @@ object GradientDescentAlg extends Logging {
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
       case _: AdadeltaUpdater =>
         regVal = updater.asInstanceOf[AdadeltaUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, momentumFraction, regParam)._2
       case _: RMSpropUpdater =>
         regVal = updater.asInstanceOf[RMSpropUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
       case _:NadamUpdater =>
         regVal = updater.asInstanceOf[NadamUpdater].compute(
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
+      case _: AMSGradUpdater =>
+        regVal = updater.asInstanceOf[AMSGradUpdater].compute(
           weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
     }
 
@@ -381,6 +388,12 @@ object GradientDescentAlg extends Logging {
               i, regParam)
             weights = update._1
             regVal = update._2
+          case _: AMSGradUpdater =>
+            val update = updater.asInstanceOf[AMSGradUpdater].compute(
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
+              i, regParam)
+            weights = update._1
+            regVal = update._2
         }
 
         previousWeights = currentWeights
@@ -388,8 +401,7 @@ object GradientDescentAlg extends Logging {
         if (previousWeights != None && currentWeights != None) {
           converged = isConverged(previousWeights.get,
             currentWeights.get, convergenceTol)
-          if(converged)
-            println("Converged after "+i+" iterations")
+         // if(converged) println("Converged after "+i+" iterations")
         }
       } else {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
