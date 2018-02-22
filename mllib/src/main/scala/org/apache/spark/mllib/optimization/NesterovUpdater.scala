@@ -15,15 +15,48 @@ class NesterovUpdater extends AdaptiveUpdater{
   def compute(weightsOld: Vector,
                         gradientShifted: Vector,
                         momentumFraction: Double,
-                        stepSize: Double,
+                        inStepSize: Double,
                         iter: Int,
-                        regParam: Double): (Vector, Double, Vector) = {
+                        regParam: Double,
+                        regType: Int,
+                        decay: Boolean): (Vector, Double, Vector) = {
+    var stepSize : Double = 0
+    if(decay) stepSize = inStepSize / math.sqrt(iter)
+    else stepSize = inStepSize
+
     if(momentumOld == null) {momentumOld = DenseVector.zeros[Double](weightsOld.size)}
     val brzWeights: BV[Double] = weightsOld.asBreeze.toDenseVector
     val brzGradient: BV[Double] = gradientShifted.asBreeze.toDenseVector
     val momentumNew = momentumOld * momentumFraction + brzGradient * stepSize
     val weightsNew = brzWeights - momentumNew
     momentumOld = momentumNew
-    (Vectors.fromBreeze(weightsNew), 0, Vectors.fromBreeze(weightsNew-momentumFraction*momentumNew))
+
+    //L1 Regularization
+    if(regType==1) {
+      val weightsNew = brzWeights - momentumNew
+      // Apply proximal operator (soft thresholding)
+      val shrinkageVal = regParam * stepSize
+      var i = 0
+      val len = brzWeights.length
+      while (i < len) {
+        val wi = weightsNew(i)
+        weightsNew(i) = signum(wi) * max(0.0, abs(wi) - shrinkageVal)
+        i += 1
+      }
+      (Vectors.fromBreeze(weightsNew), brzNorm(weightsNew, 1.0) * regParam,Vectors.fromBreeze(weightsNew-momentumFraction*momentumNew))
+    }
+    //L2 regularization
+    else if (regType==2){
+      brzWeights :*= (1.0 - stepSize* regParam)
+      val weightsNew = brzWeights - momentumNew
+      val norm = brzNorm(weightsNew, 2.0)
+
+      (Vectors.fromBreeze(weightsNew), 0.5 * regParam * norm * norm,Vectors.fromBreeze(weightsNew-momentumFraction*momentumNew))
+    }
+    //No regularization
+    else{
+      val weightsNew = brzWeights - momentumNew
+      (Vectors.fromBreeze(weightsNew), 0,Vectors.fromBreeze(weightsNew-momentumFraction*momentumNew))
+    }
   }
 }

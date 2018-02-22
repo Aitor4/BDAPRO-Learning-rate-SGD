@@ -24,6 +24,8 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.ArrayBuffer
+import breeze.numerics.{sqrt => sqrt}
+import org.apache.spark.mllib.linalg.BLAS.{axpy, dot, scal}
 
 /**
   * Class used to solve an optimization problem using Gradient Descent.
@@ -48,6 +50,8 @@ class GradientDescentAlg private[spark](
   //for adam
   private var beta : Double = 0.9
   private var betaS : Double = 0.999
+  private var regType: Int = 0
+  private var decay :Boolean = false
 
   /**
     * Set the initial step size for the first step. Default 1.0.
@@ -156,6 +160,18 @@ class GradientDescentAlg private[spark](
     this
   }
 
+  def setDecay(decay: Boolean): this.type = {
+    this.decay = decay
+    this
+  }
+
+  def setRegType(regType: Int): this.type = {
+    require(regType >= 0 && regType <= 2,
+      "regType must be = (no regularization), 1 (L1), or 2 (L2)")
+    this.regType = regType
+    this
+  }
+
   /**
     * :: DeveloperApi ::
     * Runs gradient descent on the given training data.
@@ -179,7 +195,9 @@ class GradientDescentAlg private[spark](
       smoothingTerm,
       beta,
       betaS,
-      convergenceTol)
+      convergenceTol,
+      regType,
+      decay)
     weights
   }
 
@@ -228,7 +246,9 @@ object GradientDescentAlg extends Logging {
                     smoothingTerm: Double,
                     beta: Double,
                     betaS: Double,
-                    convergenceTol: Double): (Vector, Array[Double]) = {
+                    convergenceTol: Double,
+                    regType: Int,
+                    decay:Boolean): (Vector, Array[Double]) = {
 
     // convergenceTol should be set with non minibatch settings
     if (miniBatchFraction < 1.0 && convergenceTol > 0.0) {
@@ -268,34 +288,34 @@ object GradientDescentAlg extends Logging {
     updater match {
       case _: SimpleUpdater =>
         regVal = updater.asInstanceOf[SimpleUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, 0, regParam,regType,decay)._2
       case _: AdamUpdater =>
         regVal = updater.asInstanceOf[AdamUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam, regType, decay)._2
       case _: AdagradUpdater =>
         regVal = updater.asInstanceOf[AdagradUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam,regType,decay)._2
       case _: MomentumUpdater =>
         regVal = updater.asInstanceOf[MomentumUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, 0, 1, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, 0, 1, regParam,regType,decay)._2
       case _: NesterovUpdater =>
         regVal = updater.asInstanceOf[NesterovUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, 0, 1, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, 0, 1, regParam,regType,decay)._2
       case _: AdamaxUpdater =>
         regVal = updater.asInstanceOf[AdamaxUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam,regType,decay)._2
       case _: AdadeltaUpdater =>
         regVal = updater.asInstanceOf[AdadeltaUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, momentumFraction, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, momentumFraction, regParam,regType,decay)._2
       case _: RMSpropUpdater =>
         regVal = updater.asInstanceOf[RMSpropUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, 0, regParam,regType,decay)._2
       case _:NadamUpdater =>
         regVal = updater.asInstanceOf[NadamUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam,regType,decay)._2
       case _: AMSGradUpdater =>
         regVal = updater.asInstanceOf[AMSGradUpdater].compute(
-          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam)._2
+          weights, Vectors.zeros(weights.size), 0, smoothingTerm, beta, betaS, 0, regParam,regType,decay)._2
     }
 
 
@@ -336,68 +356,69 @@ object GradientDescentAlg extends Logging {
         updater match {
           case _: SimpleUpdater =>
             val update = updater.asInstanceOf[SimpleUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, i, regParam)
+              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: AdamUpdater =>
             val update = updater.asInstanceOf[AdamUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam)
+              i, regParam, regType, decay)
             weights = update._1
             regVal = update._2
           case _: AdagradUpdater =>
             val update = updater.asInstanceOf[AdagradUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, regParam)
+              i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: MomentumUpdater =>
             val update = updater.asInstanceOf[MomentumUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              learningRate, i, regParam)
+              learningRate, i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: NesterovUpdater =>
             val update = updater.asInstanceOf[NesterovUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              learningRate, i, regParam)
+              learningRate, i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
             weightsShifted = update._3
           case _: AdamaxUpdater =>
             val update = updater.asInstanceOf[AdamaxUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam)
+              i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: AdadeltaUpdater =>
             val update = updater.asInstanceOf[AdadeltaUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, momentumFraction ,regParam)
+              i, momentumFraction ,regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: RMSpropUpdater =>
             val update = updater.asInstanceOf[RMSpropUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, regParam)
+              i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: NadamUpdater =>
             val update = updater.asInstanceOf[NadamUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam)
+              i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
           case _: AMSGradUpdater =>
             val update = updater.asInstanceOf[AMSGradUpdater].compute(
               weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam)
+              i, regParam,regType,decay)
             weights = update._1
             regVal = update._2
         }
 
         previousWeights = currentWeights
         currentWeights = Some(weights)
+
         if (previousWeights != None && currentWeights != None) {
           converged = isConverged(previousWeights.get,
             currentWeights.get, convergenceTol)
@@ -406,7 +427,7 @@ object GradientDescentAlg extends Logging {
       } else {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
-      println("Loss in iteration "+i+" : "+lossSum / miniBatchSize)
+      println("Loss in iteration "+i+" : "+(lossSum / miniBatchSize))
       i += 1
     }
 
@@ -432,9 +453,11 @@ object GradientDescentAlg extends Logging {
                     smoothingTerm: Double,
                     beta: Double,
                     betaS: Double,
-                    initialWeights: Vector): (Vector, Array[Double]) =
+                    initialWeights: Vector,
+                    regType:Int,
+                    decay:Boolean): (Vector, Array[Double]) =
     GradientDescentAlg.runMiniBatch(data, gradient, updater, momentumFraction, learningRate, numIterations,
-      regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001)
+      regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001,regType,decay)
 
 
   private def isConverged(
@@ -449,5 +472,6 @@ object GradientDescentAlg extends Logging {
     val solutionVecDiff: Double = norm(previousBDV - currentBDV)
     solutionVecDiff < convergenceTol * Math.max(norm(currentBDV), 1.0)
   }
+
 
 }
