@@ -24,6 +24,8 @@
 !LogisticRegressionWithAdaSGD.scala
 !SVMWithAdaSGD.scala
 !AMSGradUpdater.scala
+!OptimizerWithAdaSGD.scala
+!GeneralizedLinearAlgorithmWithAdaSGD.scala
 # etc...
 
 # ...even if they are in subdirectories

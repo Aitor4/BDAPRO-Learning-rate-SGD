@@ -52,10 +52,11 @@ class GradientDescentAlg private[spark](
   private var betaS : Double = 0.999
   private var regType: Int = 0
   private var decay :Boolean = false
+  private var validationSplit:Double = 0
+  private var iterValidation:Int = 50
 
   /**
     * Set the initial step size for the first step. Default 1.0.
-    * In subsequent steps, the step size will decrease with learningRate/sqrt(t)
     */
   def setStepSize(step: Double): this.type = {
     require(step > 0,
@@ -172,6 +173,20 @@ class GradientDescentAlg private[spark](
     this
   }
 
+  def setValidationSplit(split: Double): this.type = {
+    require(split >= 0 && split <= 0.5,
+      "validationSplit must be >= 0 and <= 0.5")
+    this.validationSplit = split
+    this
+  }
+
+  def setIterValidation(iter: Int): this.type = {
+    require(iter >= 2,
+      "iterValidation must be >= 2")
+    this.iterValidation = iter
+    this
+  }
+
   /**
     * :: DeveloperApi ::
     * Runs gradient descent on the given training data.
@@ -181,8 +196,8 @@ class GradientDescentAlg private[spark](
     * @return solution vector
     */
   @DeveloperApi
-  def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): Vector = {
-    val (weights, _) = GradientDescentAlg.runMiniBatch(
+  def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): (Vector, Array[Double]) = {
+    val (weights, loss) = GradientDescentAlg.runMiniBatch(
       data,
       gradient,
       updater,
@@ -197,8 +212,10 @@ class GradientDescentAlg private[spark](
       betaS,
       convergenceTol,
       regType,
-      decay)
-    weights
+      decay,
+      validationSplit,
+      iterValidation)
+    (weights, loss)
   }
 
 }
@@ -248,7 +265,9 @@ object GradientDescentAlg extends Logging {
                     betaS: Double,
                     convergenceTol: Double,
                     regType: Int,
-                    decay:Boolean): (Vector, Array[Double]) = {
+                    decay:Boolean,
+                    validationSplit:Double,
+                    iterValidation: Int): (Vector, Array[Double]) = {
 
     // convergenceTol should be set with non minibatch settings
     if (miniBatchFraction < 1.0 && convergenceTol > 0.0) {
@@ -262,6 +281,7 @@ object GradientDescentAlg extends Logging {
     }
 
     val stochasticLossHistory = new ArrayBuffer[Double](numIterations)
+    val validationLoss = new ArrayBuffer[Double](numIterations)
     // Record previous weight and current one to calculate solution vector difference
 
     var previousWeights: Option[Vector] = None
@@ -322,7 +342,10 @@ object GradientDescentAlg extends Logging {
     var converged = false // indicates whether converged based on convergenceTol
     var i = 1
 
-    while (!converged && i <= numIterations) {
+    val Array(train,validation) = data.randomSplit(Array(1-validationSplit, validationSplit), seed = 41);
+
+    var earlyStopped = false
+    while (!converged && i <= numIterations && !earlyStopped) {
 
       var bcWeights: org.apache.spark.broadcast.Broadcast[Vector] = null
       if (updater.isInstanceOf[NesterovUpdater]){
@@ -334,7 +357,7 @@ object GradientDescentAlg extends Logging {
 
       // Sample a subset (fraction miniBatchFraction) of the total data
       // compute and sum up the subgradients on this subset (this is one map-reduce)
-      val (gradientSum, lossSum, miniBatchSize) = data.sample(false, miniBatchFraction, 42 + i)
+      val (gradientSum, lossSum, miniBatchSize) = train.sample(false, miniBatchFraction, 42 + i)
         .treeAggregate((BDV.zeros[Double](n), 0.0, 0L)) (
           seqOp = (c, v) => {
             // c: (grad, loss, count), v: (label, features)
@@ -345,6 +368,21 @@ object GradientDescentAlg extends Logging {
             // c: (grad, loss, count)
             (c1._1 += c2._1, c1._2 + c2._2, c1._3 + c2._3)
           })
+      var lossSumVal=0
+      var miniBatchSizeVal=1
+      if(validationSplit>0) {
+        var (gradientSumVal, lossSumVal, miniBatchSizeVal) = validation.sample(false, miniBatchFraction, 42 + i)
+          .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(
+            seqOp = (c, v) => {
+              // c: (grad, loss, count), v: (label, features)
+              val l = gradient.compute(v._2, v._1, bcWeights.value, Vectors.fromBreeze(c._1))
+              (c._1, c._2 + l, c._3 + 1)
+            },
+            combOp = (c1, c2) => {
+              // c: (grad, loss, count)
+              (c1._1 += c2._1, c1._2 + c2._2, c1._3 + c2._3)
+            })
+      }
 
       if (miniBatchSize > 0) {
         /**
@@ -352,70 +390,75 @@ object GradientDescentAlg extends Logging {
           * and regVal is the regularization value computed in the previous iteration as well.
           */
         stochasticLossHistory += lossSum / miniBatchSize + regVal
-
-        updater match {
-          case _: SimpleUpdater =>
-            val update = updater.asInstanceOf[SimpleUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: AdamUpdater =>
-            val update = updater.asInstanceOf[AdamUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam, regType, decay)
-            weights = update._1
-            regVal = update._2
-          case _: AdagradUpdater =>
-            val update = updater.asInstanceOf[AdagradUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: MomentumUpdater =>
-            val update = updater.asInstanceOf[MomentumUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              learningRate, i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: NesterovUpdater =>
-            val update = updater.asInstanceOf[NesterovUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
-              learningRate, i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-            weightsShifted = update._3
-          case _: AdamaxUpdater =>
-            val update = updater.asInstanceOf[AdamaxUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: AdadeltaUpdater =>
-            val update = updater.asInstanceOf[AdadeltaUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, momentumFraction ,regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: RMSpropUpdater =>
-            val update = updater.asInstanceOf[RMSpropUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
-              i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: NadamUpdater =>
-            val update = updater.asInstanceOf[NadamUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
-          case _: AMSGradUpdater =>
-            val update = updater.asInstanceOf[AMSGradUpdater].compute(
-              weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
-              i, regParam,regType,decay)
-            weights = update._1
-            regVal = update._2
+        validationLoss += lossSumVal / miniBatchSizeVal + regVal
+        if(validationSplit==0||i<=iterValidation||(validationLoss(i-1) < validationLoss(i-2))) {
+          updater match {
+            case _: SimpleUpdater =>
+              val update = updater.asInstanceOf[SimpleUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: AdamUpdater =>
+              val update = updater.asInstanceOf[AdamUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: AdagradUpdater =>
+              val update = updater.asInstanceOf[AdagradUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: MomentumUpdater =>
+              val update = updater.asInstanceOf[MomentumUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
+                learningRate, i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: NesterovUpdater =>
+              val update = updater.asInstanceOf[NesterovUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), momentumFraction,
+                learningRate, i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+              weightsShifted = update._3
+            case _: AdamaxUpdater =>
+              val update = updater.asInstanceOf[AdamaxUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: AdadeltaUpdater =>
+              val update = updater.asInstanceOf[AdadeltaUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
+                i, momentumFraction, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: RMSpropUpdater =>
+              val update = updater.asInstanceOf[RMSpropUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: NadamUpdater =>
+              val update = updater.asInstanceOf[NadamUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+            case _: AMSGradUpdater =>
+              val update = updater.asInstanceOf[AMSGradUpdater].compute(
+                weights, Vectors.fromBreeze(gradientSum / miniBatchSize.toDouble), learningRate, smoothingTerm, beta, betaS,
+                i, regParam, regType, decay)
+              weights = update._1
+              regVal = update._2
+          }
         }
-
+        else {
+          earlyStopped = true
+          println("Stopped early!!!!")
+        }
         previousWeights = currentWeights
         currentWeights = Some(weights)
 
@@ -428,6 +471,8 @@ object GradientDescentAlg extends Logging {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
       println("Loss in iteration "+i+" : "+(lossSum / miniBatchSize))
+      if(validationSplit>0) println("Validation loss in iteration "+i+" : "+(lossSumVal / miniBatchSizeVal))
+
       i += 1
     }
 
@@ -455,9 +500,12 @@ object GradientDescentAlg extends Logging {
                     betaS: Double,
                     initialWeights: Vector,
                     regType:Int,
-                    decay:Boolean): (Vector, Array[Double]) =
+                    decay:Boolean,
+                    validationSplit:Double,
+                    iterValidation: Int): (Vector, Array[Double]) =
     GradientDescentAlg.runMiniBatch(data, gradient, updater, momentumFraction, learningRate, numIterations,
-      regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001,regType,decay)
+      regParam, miniBatchFraction, initialWeights, beta, betaS, smoothingTerm, 0.001,regType,decay,validationSplit,
+      iterValidation)
 
 
   private def isConverged(

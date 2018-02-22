@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,14 +23,14 @@ import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
 /**
- * :: DeveloperApi ::
- * Trait for optimization problem solvers.
- */
+  * :: DeveloperApi ::
+  * Trait for optimization problem solvers.
+  */
 @DeveloperApi
-trait Optimizer extends Serializable {
+trait OptimizerWithAdaSGD extends Serializable {
 
   /**
-   * Solve the provided convex optimization problem.
-   */
-  def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): Vector
+    * Solve the provided convex optimization problem.
+    */
+  def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): (Vector, Array[Double])
 }
