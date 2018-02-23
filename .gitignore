@@ -18,6 +18,8 @@
 !AMSGradUpdater.scala
 !OptimizerWithAdaSGD.scala
 !GeneralizedLinearAlgorithmWithAdaSGD.scala
+!TestAdaOptimizer.scala
+!TestLoopAdaOptimizer.scala
 # etc...
 
 # ...even if they are in subdirectories
