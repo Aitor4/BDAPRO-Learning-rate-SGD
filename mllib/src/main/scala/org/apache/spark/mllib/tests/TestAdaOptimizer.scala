@@ -1,4 +1,4 @@
-package org.apache.spark.mllib.optimization
+package org.apache.spark.mllib.tests
 
 
 import org.apache.spark.{SparkConf, SparkContext}
