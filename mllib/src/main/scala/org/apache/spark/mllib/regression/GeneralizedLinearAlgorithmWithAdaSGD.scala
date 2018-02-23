@@ -28,10 +28,12 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 
 /**
-  * :: DeveloperApi ::
-  * GeneralizedLinearModel (GLM) represents a model trained using
-  * GeneralizedLinearAlgorithm. GLMs consist of a weight vector and
-  * an intercept.
+  * Trait for optimization problem solvers, modified to return not only the weights but also the
+  * training loss (in order to return the loss when training the algorithm).
+  *
+  * The trait is based on the trait "GeneralizedLinearAlgorithm" from org.apache.spark.mllib.regression
+  * Most of the comments and code are from the original class, we therefore indicate our comments with
+  * "::Extension::" in the beginning
   *
   * @param weights Weights computed for every feature.
   * @param intercept Intercept computed for this model.
@@ -108,7 +110,8 @@ abstract class GeneralizedLinearAlgorithmWithAdaSGD[M <: GeneralizedLinearModel]
 
   /**
     * The optimizer to solve the problem.
-    *
+    * ::Extension:: use our OptimizerWithAdaSGD trait rather than the original Optimizer to be able
+    * to receive the training loss
     */
   @Since("0.8.0")
   def optimizer: OptimizerWithAdaSGD
@@ -226,7 +229,7 @@ abstract class GeneralizedLinearAlgorithmWithAdaSGD[M <: GeneralizedLinearModel]
   /**
     * Run the algorithm with the configured parameters on an input
     * RDD of LabeledPoint entries.
-    *
+    * ::Extension:: return the training loss history array as well as the trained model
     */
   @Since("0.8.0")
   def run(input: RDD[LabeledPoint]): (M, Array[Double]) = {
@@ -236,7 +239,7 @@ abstract class GeneralizedLinearAlgorithmWithAdaSGD[M <: GeneralizedLinearModel]
   /**
     * Run the algorithm with the configured parameters on an input RDD
     * of LabeledPoint entries starting from the initial weights provided.
-    *
+    * ::Extension:: return the training loss history array as well as the trained model
     */
   @Since("1.0.0")
   def run(input: RDD[LabeledPoint], initialWeights: Vector): (M, Array[Double]) = {
@@ -309,6 +312,9 @@ abstract class GeneralizedLinearAlgorithmWithAdaSGD[M <: GeneralizedLinearModel]
       initialWeights
     }
 
+    //::Extension:: receive the training loss history array as well as the trained weights
+    // In the original Optimizer trait, only the weights are returned, but using our OptimizerWithAdaSGD,
+    // we also return the training loss for monitoring the performance of the updaters
     val res = optimizer.optimize(data, initialWeightsWithIntercept)
     val weightsWithIntercept = res._1
     val lossHistory = res._2
@@ -369,7 +375,7 @@ abstract class GeneralizedLinearAlgorithmWithAdaSGD[M <: GeneralizedLinearModel]
     if (data.getStorageLevel != StorageLevel.NONE) {
       data.unpersist(false)
     }
-
+    //::Extension:: return the training loss history array as well as the trained model
     (createModel(weights, intercept), lossHistory)
   }
 }
