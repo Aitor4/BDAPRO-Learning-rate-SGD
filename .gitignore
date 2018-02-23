@@ -3,20 +3,12 @@
 
 # But not these files...
 !.gitignore
-!App.scala
-!Flights.scala
-!Updater.scala
 !MomentumUpdater.scala
 !NesterovUpdater.scala
 !AdagradUpdater.scala
 !AdamUpdater.scala
 !AdamaxUpdater.scala
 !AdadeltaUpdater.scala
-!MomentumGradientDescent.scala
-!NesterovGradientDescent.scala
-!AdagradGradientDescent.scala
-!AdamGradientDescent.scala
-!AdamaxGradientDescent.scala
 !GradientDescentAlg.scala
 !NadamUpdater.scala
 !RMSpropUpdater.scala
