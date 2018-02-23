@@ -20,6 +20,7 @@
 !GeneralizedLinearAlgorithmWithAdaSGD.scala
 !TestAdaOptimizer.scala
 !TestLoopAdaOptimizer.scala
+!build.sbt
 # etc...
 
 # ...even if they are in subdirectories
