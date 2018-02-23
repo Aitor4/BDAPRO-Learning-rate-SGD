@@ -2,7 +2,6 @@
 *
 
 # But not these files...
-!.gitignore
 !MomentumUpdater.scala
 !NesterovUpdater.scala
 !AdagradUpdater.scala
@@ -21,9 +20,8 @@
 !TestAdaOptimizer.scala
 !TestLoopAdaOptimizer.scala
 !build.sbt
-!dat/a9a
-!data/a9at
+!SimpleUpdater.scala
 # etc...
-
+target/*
 # ...even if they are in subdirectories
 !*/
