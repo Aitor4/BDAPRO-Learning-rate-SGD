@@ -21,6 +21,8 @@
 !TestAdaOptimizer.scala
 !TestLoopAdaOptimizer.scala
 !build.sbt
+!dat/a9a
+!data/a9at
 # etc...
 
 # ...even if they are in subdirectories
