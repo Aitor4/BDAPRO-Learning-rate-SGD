@@ -1,13 +1,12 @@
 package org.apache.spark.mllib.tests
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.mllib.classification._
-import org.apache.spark.mllib.evaluation.{BinaryClassificationMetrics, MulticlassMetrics}
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.apache.spark.mllib.optimization._
 import org.apache.spark.mllib.regression._
 import org.apache.spark.mllib.util.MLUtils
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf, SparkContext}
 
 
 
@@ -58,7 +57,6 @@ object TestLoopAdaOptimizer extends App {
               .setDecay(true)
               //.setRegType(1)
               //.setRegParam(0.1)
-              .set
             val currentTime = System.currentTimeMillis()
             val (model, lossHistory) = lr.run(training)
             val elapsedTime = System.currentTimeMillis() - currentTime
