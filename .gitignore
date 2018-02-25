@@ -19,10 +19,12 @@
 !GeneralizedLinearAlgorithmWithAdaSGD.scala
 !TestAdaOptimizer.scala
 !TestLoopAdaOptimizer.scala
+!TestDatasets.scala
 !build.sbt
 !SimpleUpdater.scala
 !/gitignore
 # etc...
+data/*
 target/*
 # ...even if they are in subdirectories
 !*/
