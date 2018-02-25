@@ -21,6 +21,9 @@
 !TestLoopAdaOptimizer.scala
 !build.sbt
 !SimpleUpdater.scala
+!/data/a9a
+!/data/a9at
+!/gitignore
 # etc...
 target/*
 # ...even if they are in subdirectories

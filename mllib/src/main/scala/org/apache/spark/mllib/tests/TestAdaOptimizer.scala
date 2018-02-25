@@ -39,7 +39,6 @@ object TestAdaOptimizer extends App {
 
 
         svm.optimizer
-          .setRegParam(0.0)
           .setNumIterations(1000)
           .setConvergenceTol(0.001)
           .setStepSize(0.2)
@@ -48,6 +47,8 @@ object TestAdaOptimizer extends App {
           .setRegParam(0.1)
           .setRegType(1)
           .setDecay(false)
+          .setIterValidation(50)
+          .setValidationSplit(0.2)
 
         val currentTime = System.currentTimeMillis()
         val (model, lossHistory) = svm.run(training)

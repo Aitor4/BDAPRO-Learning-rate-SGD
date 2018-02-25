@@ -58,6 +58,7 @@ object TestLoopAdaOptimizer extends App {
               .setDecay(true)
               //.setRegType(1)
               //.setRegParam(0.1)
+              .set
             val currentTime = System.currentTimeMillis()
             val (model, lossHistory) = lr.run(training)
             val elapsedTime = System.currentTimeMillis() - currentTime

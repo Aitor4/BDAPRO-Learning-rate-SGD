@@ -21,8 +21,6 @@
 !TestLoopAdaOptimizer.scala
 !build.sbt
 !SimpleUpdater.scala
-!/data/a9a
-!/data/a9at
 !/gitignore
 # etc...
 target/*
