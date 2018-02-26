@@ -21,13 +21,18 @@ object TestDatasets extends App {
     val rootLogger = Logger.getRootLogger()
     rootLogger.setLevel(Level.ERROR)
 
-    val filename = args(0)
-    val updater_type = args(1).toInt
-    val learning_rate = args(2).toFloat
-    val mini_batch_fraction = args(3).toFloat
-    val num_iterations = args(4).toInt
-    val alg_type = args(5)
-
+    if(args.length != 6){
+      throw new IllegalArgumentException("6 arugments are needed: filename - updater - " +
+        "learning rate - minibatch fraction - number of iterations - algorithm")
+    }
+    else {
+        val filename = args(0)
+        val updater_type = args(1).toInt
+        val learning_rate = args(2).toFloat
+        val mini_batch_fraction = args(3).toFloat
+        val num_iterations = args(4).toInt
+        val alg_type = args(5)
+      }
     var training: RDD[LabeledPoint] = null
     var testing: RDD[LabeledPoint] = null
 
@@ -38,8 +43,8 @@ object TestDatasets extends App {
         testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
       case "madelon" =>
         println("adult")
-        training = MLUtils.loadLibSVMFile(sc, "data/a9a").repartition(4)
-        testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
+        training = MLUtils.loadLibSVMFile(sc, "data/madelon-training").repartition(4)
+        testing = MLUtils.loadLibSVMFile(sc, "data/madelon-testing")
       case "news" =>
         println("news")
         training = MLUtils.loadLibSVMFile(sc, "data/news-training").repartition(4)
