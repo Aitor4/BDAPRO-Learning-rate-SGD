@@ -23,6 +23,7 @@
 !build.sbt
 !SimpleUpdater.scala
 !/gitignore
+!plots.py
 # etc...
 data/*
 target/*
