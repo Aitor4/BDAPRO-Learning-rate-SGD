@@ -54,7 +54,7 @@ object TestLoopAdaOptimizer extends App {
     //val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
 
     //Define the algorithm to try, 0=Logistic regression, 1=SVM
-    val i = 0
+    val algorithm = 0
 
     //Define the parameters for the updaters:
     //Maximum number of iterations to run
@@ -74,7 +74,7 @@ object TestLoopAdaOptimizer extends App {
     val decay = false
 
     //Loop to prepare the optimizer with the appropriate parameters
-      if (i==0){ val lr = new LogisticRegressionWithAdaSGD()
+      if (algorithm==0){ val lr = new LogisticRegressionWithAdaSGD()
         var u = 0
         for(updater<-updaters){
           for (r <- variation_rates) {
