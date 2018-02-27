@@ -424,8 +424,9 @@ object GradientDescentAlg extends Logging {
           })
       //::Extension:: If the validation split is larger than 0, calculate the loss on the validation set to check
       //later the early stopping condition
-      var lossSumVal=0
+      var lossSumVal=20
       var miniBatchSizeVal=1
+      var gradientSumVal=0
       if(validationSplit>0) {
         var (gradientSumVal, lossSumVal, miniBatchSizeVal) = validation.sample(false, miniBatchFraction, 42 + i)
           .treeAggregate((BDV.zeros[Double](n), 0.0, 0L))(
@@ -438,6 +439,8 @@ object GradientDescentAlg extends Logging {
               // c: (grad, loss, count)
               (c1._1 += c2._1, c1._2 + c2._2, c1._3 + c2._3)
             })
+        //::Extension:: Accumulate validation loss
+        validationLoss += lossSumVal / miniBatchSizeVal + regVal
       }
 
       if (miniBatchSize > 0) {
@@ -446,8 +449,6 @@ object GradientDescentAlg extends Logging {
           * and regVal is the regularization value computed in the previous iteration as well.
           */
         stochasticLossHistory += lossSum / miniBatchSize + regVal
-        //::Extension:: Accumulate validation loss
-        validationLoss += lossSumVal / miniBatchSizeVal + regVal
         //::Extension:: Update the weights with the corresponding updater call with the appropriate parameters
         // Only performing the weight update if the early stopping condition is not met. Otherwise the
         //weights from the previous iteration need to be returned.
@@ -517,7 +518,6 @@ object GradientDescentAlg extends Logging {
         }
         else {
           earlyStopped = true
-          println("Stopped early!!!!")
         }
         previousWeights = currentWeights
         currentWeights = Some(weights)
@@ -530,7 +530,7 @@ object GradientDescentAlg extends Logging {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
       println("Loss in iteration "+i+" : "+(lossSum / miniBatchSize))
-      if(validationSplit>0) println("Validation loss in iteration "+i+" : "+(lossSumVal / miniBatchSizeVal))
+      //if(validationSplit>0) println("Validation loss in iteration "+i+" : "+validationLoss(i-1))
 
       i += 1
     }
