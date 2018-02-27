@@ -23,12 +23,13 @@ import org.apache.spark.{SparkConf, SparkContext}
   * updater_type: 0-9 -- 0: simple, 1: momentum, 2: nesterov, 3: adagrad, 4: adadelta,
   * 5: RMSprop, 6: adam, 7: adamax, 8: nadam, 9: AMSgrad
   * learning_rate: double (0-inf)
+  * mini_batch_fraction: double (0-1)
   * num_iterations: int (0-inf)
   * alg_type: lr/svm -- logistic regression or SVM
   *
   * Example of call:
   *
-  * executable adult 6 0.2 200 lr
+  * executable adult 6 0.2 1 200 lr
   */
 
 object TestDatasets extends App {
