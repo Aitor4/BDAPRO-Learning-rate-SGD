@@ -529,7 +529,9 @@ object GradientDescentAlg extends Logging {
       } else {
         logWarning(s"Iteration ($i/$numIterations). The size of sampled batch is zero")
       }
-      println("Loss in iteration "+i+" : "+(lossSum / miniBatchSize))
+      //Print loss of current iteration
+      println("Loss in iteration "+i+" : "+(lossSum / miniBatchSize + regVal))
+      //Print validation loss of current iteration (optional)
       //if(validationSplit>0) println("Validation loss in iteration "+i+" : "+validationLoss(i-1))
 
       i += 1

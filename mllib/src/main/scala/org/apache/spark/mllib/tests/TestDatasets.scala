@@ -10,11 +10,32 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
+/**
+  * Test class that lets the user call the program with desired arguments, letting decide
+  * the dataset to test (within the ones allowed), and the parameters
+  *
+  * For a more customizable class letting experiment with other aspects (e.g. regularization), see TestLoopAdaOptimizer
+  *
+  * Format to call:
+  * executable filename updater_type learning_rate mini_batch_fraction num_iterations alg_type
+  *
+  * filename: adult/madelon/news/susy -- sparse small/?/sparse big/dense big
+  * updater_type: 0-9 -- 0: simple, 1: momentum, 2: nesterov, 3: adagrad, 4: adadelta,
+  * 5: RMSprop, 6: adam, 7: adamax, 8: nadam, 9: AMSgrad
+  * learning_rate: double (0-inf)
+  * num_iterations: int (0-inf)
+  * alg_type: lr/svm -- logistic regression or SVM
+  *
+  * Example of call:
+  *
+  * executable adult 6 0.2 200 lr
+  */
 
 object TestDatasets extends App {
 
   override def main(args: Array[String]): Unit = {
 
+    //Prepare spark variables etc.
     System.setProperty("hadoop.home.dir", "c:/winutil/")
     System.setProperty("spark.sql.warehouse.dir", "file:///C:/spark-warehouse")
     val sc = new SparkContext(new SparkConf().setAppName("TESTADAOPTIMIZER").setMaster("local[*]"))
@@ -35,13 +56,14 @@ object TestDatasets extends App {
     var training: RDD[LabeledPoint] = null
     var testing: RDD[LabeledPoint] = null
 
+    //Load the data selected
     filename match {
       case "adult" =>
         println("adult")
         training = MLUtils.loadLibSVMFile(sc, "data/a9a").repartition(4)
         testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
       case "madelon" =>
-        println("adult")
+        println("madelon")
         training = MLUtils.loadLibSVMFile(sc, "data/madelon-training").repartition(4)
         testing = MLUtils.loadLibSVMFile(sc, "data/madelon-testing")
       case "news" =>
@@ -57,6 +79,7 @@ object TestDatasets extends App {
 
     var updater: AdaptiveUpdater = null
 
+    //Load the updater selected
     updater_type match {
       case 0 =>
         updater = new SimpleUpdater
@@ -81,58 +104,77 @@ object TestDatasets extends App {
       case _ => throw new IllegalArgumentException("updater not found")
     }
 
+    //Prepare the algorithm selected
     alg_type match {
       case "lr" =>
         val lr = new LogisticRegressionWithAdaSGD()
         lr.optimizer
           .setNumIterations(num_iterations)
-          .setConvergenceTol(0.001)
           .setStepSize(learning_rate)
           .setUpdater(updater)
           .setMiniBatchFraction(mini_batch_fraction)
-          .setDecay(true)
-        //.setRegType(1)
-        //.setRegParam(0.1)
+
+        //Train measuring training time (for information purposes)
         val currentTime = System.currentTimeMillis()
+        //lossHistory contains an array of the losses (can be useful for printing here)
         val (model, lossHistory) = lr.run(training)
         val elapsedTime = System.currentTimeMillis() - currentTime
-        // Compute raw scores on the training set.
-        val predictionAndLabels = testing.map { case LabeledPoint(label, features) =>
+
+        // Evaluate on the training set.
+        val predictionAndLabels = training.map { case LabeledPoint(label, features) =>
           val prediction = model.predict(features)
           (prediction, label)
         }
         // Get evaluation metrics.
         val metrics = new MulticlassMetrics(predictionAndLabels)
         val accuracy = metrics.accuracy
-        /*for (p <- (1 to lossHistory.size)){
-          println("Loss on iteration "+p+" : "+lossHistory(p-1))
-        }*/
-        println(s"Test accuracy  of updater $updater_type on alg $alg_type with rate $learning_rate = $accuracy, time elapsed: $elapsedTime millisecond.")
+
+        //Evaluate on the test set
+        val predictionAndLabels2 = testing.map { case LabeledPoint(label, features) =>
+          val prediction = model.predict(features)
+          (prediction, label)
+        }
+        // Get evaluation metrics.
+        val metrics2 = new MulticlassMetrics(predictionAndLabels2)
+        val accuracy2 = metrics2.accuracy
+
+        //Print test and train accuracies and time elapsed
+        println(s"Testing accuracy  of updater $updater_type on alg $alg_type with rate $learning_rate = $accuracy2, training accuracy $accuracy, time elapsed: $elapsedTime millisecond.")
+
       case "svm" =>
         val svm = new SVMWithAdaSGD()
         svm.optimizer
           .setNumIterations(num_iterations)
-          .setConvergenceTol(0.001)
           .setStepSize(learning_rate)
           .setUpdater(updater)
           .setMiniBatchFraction(mini_batch_fraction)
 
+        //Train measuring training time (for information purposes)
         val currentTime = System.currentTimeMillis()
+        //lossHistory contains an array of the losses (can be useful for printing here)
         val (model, lossHistory) = svm.run(training)
         val elapsedTime = System.currentTimeMillis() - currentTime
-        // Compute raw scores on the training set.
-        val predictionAndLabels = testing.map { case LabeledPoint(label, features) =>
+
+        // Evaluate on the training set.
+        val predictionAndLabels = training.map { case LabeledPoint(label, features) =>
           val prediction = model.predict(features)
           (prediction, label)
         }
         // Get evaluation metrics.
         val metrics = new MulticlassMetrics(predictionAndLabels)
         val accuracy = metrics.accuracy
-        /*for (p <- (1 to lossHistory.size)){
-              println("Loss on iteration "+p+" : "+lossHistory(p-1))
-            }*/
-        println(s"Test accuracy  of updater $updater_type on alg $alg_type with rate $learning_rate = $accuracy, time elapsed: $elapsedTime millisecond.")
 
+        //Evaluate on the test set
+        val predictionAndLabels2 = testing.map { case LabeledPoint(label, features) =>
+          val prediction = model.predict(features)
+          (prediction, label)
+        }
+        // Get evaluation metrics.
+        val metrics2 = new MulticlassMetrics(predictionAndLabels2)
+        val accuracy2 = metrics2.accuracy
+
+        //Print test and train accuracies and time elapsed
+        println(s"Testing accuracy  of updater $updater_type on alg $alg_type with rate $learning_rate = $accuracy2, training accuracy $accuracy, time elapsed: $elapsedTime millisecond.")
     }
 
     training.unpersist()
