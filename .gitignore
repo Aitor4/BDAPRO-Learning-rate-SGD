@@ -2,6 +2,8 @@
 *
 
 # But not these files...
+!results/
+!results/*/
 !MomentumUpdater.scala
 !NesterovUpdater.scala
 !AdagradUpdater.scala
