@@ -25,7 +25,5 @@
 !/gitignore
 !plots.py
 # etc...
-data/*
-target/*
 # ...even if they are in subdirectories
-!*/
+!mllib/
