@@ -19,7 +19,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   * Format to call:
   * executable filename updater_type learning_rate mini_batch_fraction num_iterations alg_type
   *
-  * filename: adult/madelon/news/susy -- sparse small/?/sparse big/dense big
+  * filename: adult/mushroom/svmguide/susy -- sparse/sparse/dense/dense dataset
   * updater_type: 0-9 -- 0: simple, 1: momentum, 2: nesterov, 3: adagrad, 4: adadelta,
   * 5: RMSprop, 6: adam, 7: adamax, 8: nadam, 9: AMSgrad
   * learning_rate: double (0-inf)
@@ -63,18 +63,18 @@ object TestDatasets extends App {
         println("adult")
         training = MLUtils.loadLibSVMFile(sc, "data/a9a").repartition(4)
         testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
-      case "madelon" =>
-        println("madelon")
-        training = MLUtils.loadLibSVMFile(sc, "data/madelon-training").repartition(4)
-        testing = MLUtils.loadLibSVMFile(sc, "data/madelon-testing")
-      case "news" =>
-        println("news")
-        training = MLUtils.loadLibSVMFile(sc, "data/news-training").repartition(4)
-        testing = MLUtils.loadLibSVMFile(sc, "data/news-testing")
+      case "mushroom" =>
+        println("mushroom")
+        training = MLUtils.loadLibSVMFile(sc, "data/mushroom-small").repartition(4)
+        testing = MLUtils.loadLibSVMFile(sc, "data/mushroom-small-t")
+      case "svmguide" =>
+        println("svmguide")
+        training = MLUtils.loadLibSVMFile(sc, "data/svmguide1").repartition(4)
+        testing = MLUtils.loadLibSVMFile(sc, "data/svmguide1.t")
       case "susy" =>
         println("susy")
-        training = MLUtils.loadLibSVMFile(sc, "data/susy-training").repartition(4)
-        testing = MLUtils.loadLibSVMFile(sc, "data/susy-testing")
+        training = MLUtils.loadLibSVMFile(sc, "data/susy_s").repartition(4)
+        testing = MLUtils.loadLibSVMFile(sc, "data/susyt_s")
       case _ => throw new IllegalArgumentException("file not found")
     }
 
