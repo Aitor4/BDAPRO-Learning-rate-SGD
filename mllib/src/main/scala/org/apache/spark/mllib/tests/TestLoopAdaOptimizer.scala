@@ -47,11 +47,11 @@ object TestLoopAdaOptimizer extends App {
       updater7, updater8, updater9)
 
     //Define the initial learning rates to try
-    val rates = Seq(1.0, 1.0, 1.0, 1.0, 10.0, 0.01, 0.2, 2.0, 0.2, 0.2)
+    val rates = Seq(1, 1, 1, 1, 1, 1, 0.2, 2, 0.2, 0.2)
     //Define the variation to try for each inital rate, according to the formula:
     //rate = initial_rate + initial_rate * variation_rate
-    //val variation_rates = Seq(9,0,-0.9)
-    val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
+    val variation_rates = Seq(9,0,-0.9)
+    //val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
 
     //Define the algorithm to try, 0=Logistic regression, 1=SVM
     val algorithm = 0
@@ -79,7 +79,7 @@ object TestLoopAdaOptimizer extends App {
         for(updater<-updaters){
           for (r <- variation_rates) {
             //Choose current rate
-            val rate = rates(u) + variation_rates(u) * r
+            val rate = rates(u) + rates(u) * r
             //Prepare the optimizer
             lr.optimizer
               .setNumIterations(numIterations)
@@ -125,7 +125,7 @@ object TestLoopAdaOptimizer extends App {
         for (updater <- updaters) {
           for (r <- variation_rates) {
             //Choose current rate
-            val rate = rates(u) + variation_rates(u) * r
+            val rate = rates(u) + rates(u) * r
             //Prepare the optimizer
             svm.optimizer
               .setNumIterations(numIterations)
