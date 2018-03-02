@@ -61,19 +61,19 @@ object TestDatasets extends App {
     filename match {
       case "adult" =>
         println("adult")
-        training = MLUtils.loadLibSVMFile(sc, "data/a9a").repartition(4)
+        training = MLUtils.loadLibSVMFile(sc, "data/a9a")
         testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
       case "mushroom" =>
         println("mushroom")
-        training = MLUtils.loadLibSVMFile(sc, "data/mushroom-small").repartition(4)
+        training = MLUtils.loadLibSVMFile(sc, "data/mushroom-small")
         testing = MLUtils.loadLibSVMFile(sc, "data/mushroom-small-t")
       case "svmguide" =>
         println("svmguide")
-        training = MLUtils.loadLibSVMFile(sc, "data/svmguide1").repartition(4)
+        training = MLUtils.loadLibSVMFile(sc, "data/svmguide1")
         testing = MLUtils.loadLibSVMFile(sc, "data/svmguide1.t")
       case "susy" =>
         println("susy")
-        training = MLUtils.loadLibSVMFile(sc, "data/susy_s").repartition(4)
+        training = MLUtils.loadLibSVMFile(sc, "data/susy_s")
         testing = MLUtils.loadLibSVMFile(sc, "data/susyt_s")
       case _ => throw new IllegalArgumentException("file not found")
     }

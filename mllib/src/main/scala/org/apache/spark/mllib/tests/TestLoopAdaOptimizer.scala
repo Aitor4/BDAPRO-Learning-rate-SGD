@@ -29,7 +29,7 @@ object TestLoopAdaOptimizer extends App {
     rootLogger.setLevel(Level.ERROR)
 
     //Load the data
-    val training = MLUtils.loadLibSVMFile(sc, "data/susy_s").repartition(4)
+    val training = MLUtils.loadLibSVMFile(sc, "data/susy_s")
     val testing = MLUtils.loadLibSVMFile(sc, "data/susyt_s")
 
     //Define the updaters to try
@@ -48,7 +48,7 @@ object TestLoopAdaOptimizer extends App {
 
     //Define the initial learning rates to try
     val rates = Seq(0.1, 0.1, 0.1, 1.0, 100.0, 0.1, 0.2, 2.0, 0.2, 0.2)
-    //Define the variation to try for each inital rate, according to the formula:
+    //Define the variation to try for each initial rate, according to the formula:
     //rate = initial_rate + initial_rate * variation_rate
     //val variation_rates = Seq(9,0,-0.9)
     val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
