@@ -47,14 +47,14 @@ object TestLoopAdaOptimizer extends App {
       updater7, updater8, updater9)
 
     //Define the initial learning rates to try
-    val rates = Seq(1, 1, 1, 1, 1, 1, 0.2, 2, 0.2, 0.2)
+    val rates = Seq(0.1, 0.1, 0.1, 1.0, 100.0, 0.1, 0.2, 2.0, 0.2, 0.2)
     //Define the variation to try for each inital rate, according to the formula:
     //rate = initial_rate + initial_rate * variation_rate
-    val variation_rates = Seq(9,0,-0.9)
-    //val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
+    //val variation_rates = Seq(9,0,-0.9)
+    val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
 
     //Define the algorithm to try, 0=Logistic regression, 1=SVM
-    val algorithm = 0
+    val algorithm = 1
 
     //Define the parameters for the updaters:
     //Maximum number of iterations to run
@@ -83,9 +83,9 @@ object TestLoopAdaOptimizer extends App {
             //Prepare the optimizer
             lr.optimizer
               .setNumIterations(numIterations)
-              .setStepSize(miniBatchFraction)
+              .setStepSize(rate)
               .setUpdater(updater)
-              .setMiniBatchFraction(1)
+              .setMiniBatchFraction(miniBatchFraction)
               .setRegType(regType)
               .setRegParam(regParam)
               .setIterValidation(iterValidation)
@@ -129,9 +129,9 @@ object TestLoopAdaOptimizer extends App {
             //Prepare the optimizer
             svm.optimizer
               .setNumIterations(numIterations)
-              .setStepSize(miniBatchFraction)
+              .setStepSize(rate)
               .setUpdater(updater)
-              .setMiniBatchFraction(1)
+              .setMiniBatchFraction(miniBatchFraction)
               .setRegType(regType)
               .setRegParam(regParam)
               .setIterValidation(iterValidation)
