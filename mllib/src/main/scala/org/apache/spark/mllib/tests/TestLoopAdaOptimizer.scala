@@ -29,8 +29,8 @@ object TestLoopAdaOptimizer extends App {
     rootLogger.setLevel(Level.ERROR)
 
     //Load the data
-    val training = MLUtils.loadLibSVMFile(sc, "data/susy_s")
-    val testing = MLUtils.loadLibSVMFile(sc, "data/susyt_s")
+    val training = MLUtils.loadLibSVMFile(sc, "data/a9a")
+    val testing = MLUtils.loadLibSVMFile(sc, "data/a9at")
 
     //Define the updaters to try
     var updater0 = new SimpleUpdater
@@ -54,13 +54,13 @@ object TestLoopAdaOptimizer extends App {
     val variation_rates = Seq(9,6,3,0,-0.3,-0.6,-0.9)
 
     //Define the algorithm to try, 0=Logistic regression, 1=SVM
-    val algorithm = 1
+    val algorithm = 0
 
     //Define the parameters for the updaters:
     //Maximum number of iterations to run
     val numIterations = 200
     //Fraction of the dataset to compute the gradient in each iteration
-    val miniBatchFraction = 1
+    val miniBatchFraction = 0.25
     //Regularization type, 0:no reg., 1: L1 reg., 2:L2 reg.
     val regType = 0
     //Regularization parameter (only used if not regType=0)
