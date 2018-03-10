@@ -36,13 +36,13 @@ object TestLoopAdaOptimizer extends App {
     var updater0 = new SimpleUpdater
     var updater1 = new MomentumUpdater
     var updater2 = new NesterovUpdater
-    var updater3 = new AdagradUpdater //0.01 learning rate
-    var updater4 = new AdadeltaUpdater // no learning rate
-    var updater5 = new RMSpropUpdater // 0.001 learning rate
-    var updater6 = new AdamUpdater //0.002
-    var updater7 = new AdamaxUpdater //0.002 learning rate
-    var updater8 = new NadamUpdater //0.002
-    var updater9 = new AMSGradUpdater //0.002 like adam
+    var updater3 = new AdagradUpdater
+    var updater4 = new AdadeltaUpdater
+    var updater5 = new RMSpropUpdater
+    var updater6 = new AdamUpdater
+    var updater7 = new AdamaxUpdater
+    var updater8 = new NadamUpdater
+    var updater9 = new AMSGradUpdater 
     val updaters = Seq(updater0, updater1, updater2, updater3, updater4, updater5, updater6,
       updater7, updater8, updater9)
 
