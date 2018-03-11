@@ -16,4 +16,4 @@ Links to our deliverables:
 [Code](Sources/BDAPRO-Learning-rate-SGD)  
 [Report](FinalReports/Report-BDAPRO-SGD-Issue19.pdf)  
 
-Note that the code folder contains the logs resulting from our experiments, plots and a script to generate those plots (results folder), the small version of the datasets used (data folder), and our actual source code (mllib/src folder).
+Note that the code folder contains the logs resulting from our experiments, plots and a python script to generate those plots (results folder), the small version of the datasets used (data folder), and our actual source code (mllib/src folder).
