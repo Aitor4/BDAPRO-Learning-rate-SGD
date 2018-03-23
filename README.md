@@ -7,6 +7,8 @@ Stochastic Gradient Descent (SGD) has become one of the preferred methods for op
 
 The aim of this project is to implement the various algorithms (updaters) that optimize gradient descent, specifically the most recently developed learning rate adaptation techniques on top of Apache Spark. Their implementation is integrated in the context of Linear Support Vector Machines and Logistic Regression. For this purpose, we also implemented and evaluated additional methds not previously present in Spark, such as early stopping, that can affect the behavior of these techinques. We have implemented the following updaters: **Momentum, Nesterov Accelerated Gradient, Adagrad, Adadelta, RMSProp, Adam, AdaMax, Nadam, AMSGrad.**
 
+If you are interested in the theory behind those method, please refer to their original papers or comprehensive descriptions of their formal definitions such as http://ruder.io/optimizing-gradient-descent/
+
 ## Files
 
 You can find the results of our experiments in the [results](results) folder, the plots corresponding to those experiments in the [plots](results/plots) folder, the datasets used for those experiments in the [data](data) folder, and finally our source code in the [mllib](mllib) folder.
